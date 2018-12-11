@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             Connection conn = new Connection(hostname);//init connection
             conn.connect();//start connection to the hostname
             boolean isAuthenticated = conn.authenticateWithPassword(username, password);
-            if (isAuthenticated == false)
+            if (!isAuthenticated)
                 throw new IOException("Authentication failed.");
             Session sess = conn.openSession();
             sess.execCommand(command);
