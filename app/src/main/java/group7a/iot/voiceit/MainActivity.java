@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             String spokenText = results.get(0);
             if (spokenText.equalsIgnoreCase("hello dumbass")){
                 speak("Hello you little piece of shit!");
-            }else {
+            }else { //hej
                 speak("Hello, you seem like a very nice and wonderful person");
             }
             Toast.makeText(MainActivity.this, spokenText, Toast.LENGTH_LONG).show();
