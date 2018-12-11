@@ -1,9 +1,14 @@
 package group7a.iot.voiceit;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.StrictMode;
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -13,11 +18,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
+
+import static android.speech.RecognizerIntent.EXTRA_PREFER_OFFLINE;
+import static android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM;
 
 public class MainActivity extends AppCompatActivity {
     TextView txv_temp_indoor = null;
@@ -29,10 +39,42 @@ public class MainActivity extends AppCompatActivity {
     Timer timer = new Timer(true);
     boolean newData = false;
     private String[] lines = new String[1000];
-    private volatile String innerTemp = "";
+    private volatile String innerTemp = "23.5";
+    private TextToSpeech textToSpeech;
+
+    private static final int SPEECH_REQUEST_CODE = 0;
+
+    // Create an intent that can start the Speech Recognizer activity
+    private void displaySpeechRecognizer() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en_US");
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
+        intent.putExtra(RecognizerIntent.LANGUAGE_MODEL_FREE_FORM, true);
+// Start the activity, the intent will be populated with the speech text
+        startActivityForResult(intent, SPEECH_REQUEST_CODE);
+    }
+
+    // This callback is invoked when the Speech Recognizer returns.
+// This is where you process the intent and extract the speech text from the intent.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
+        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
+            List<String> results = data.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS);
+            String spokenText = results.get(0);
+            if (spokenText.equalsIgnoreCase("hello dumbass")){
+                speak("Hello you little piece of shit!");
+            }else {
+                speak("Hello, you seem like a very nice and wonderful person");
+            }
+            Toast.makeText(MainActivity.this, spokenText, Toast.LENGTH_LONG).show();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     public void run(String command) {
-        String hostname = "192.168.0.101";
+        String hostname = "192.168.0.100";
         String username = "pi";
         String password = "voiceit";
         try {
@@ -90,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
             System.exit(2);
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,9 +195,8 @@ public class MainActivity extends AppCompatActivity {
                 if (isChecked) { //do something if checked
 
                     txv_heating_status.setText("On");
-                    //action
+                    displaySpeechRecognizer();
 
-                    Toast.makeText(MainActivity.this, "Hej", Toast.LENGTH_LONG).show();
                 } else {
                     txv_heating_status.setText("Off");
                     //action
@@ -177,6 +219,40 @@ public class MainActivity extends AppCompatActivity {
 //                //txv_temp_outdoor.setText(("" + outdoorDouble).substring(0, 4));
 //            }
 //        }.execute(1);
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int ttsLang = textToSpeech.setLanguage(Locale.US);
 
+                    if (ttsLang == TextToSpeech.LANG_MISSING_DATA
+                            || ttsLang == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("TTS", "The Language is not supported!");
+                    } else {
+                        Log.i("TTS", "Language Supported.");
+                    }
+                    Log.i("TTS", "Initialization success.");
+                } else {
+                    Toast.makeText(getApplicationContext(), "TTS Initialization failed!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+    private void speak(String whatToSpeak){
+        //String data = "The temperature is " + innerTemp;
+        //Log.i("TTS", "button clicked: " + data);
+        int speechStatus = textToSpeech.speak(whatToSpeak, TextToSpeech.QUEUE_FLUSH, null);
+
+        if (speechStatus == TextToSpeech.ERROR) {
+            Log.e("TTS", "Error in converting Text to Speech!");
+        }
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
     }
 }
