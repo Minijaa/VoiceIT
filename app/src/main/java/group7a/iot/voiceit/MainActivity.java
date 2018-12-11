@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     Timer timer = new Timer(true);
     boolean newData = false;
     private String[] lines = new String[1000];
-    private volatile String innerTemp = "23.5";
+    private volatile String innerTemp = "0";
     private TextToSpeech textToSpeech;
 
     private static final int SPEECH_REQUEST_CODE = 0;
@@ -70,37 +70,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleVoiceCommand(String spokenText) {
         switch (spokenText) {
-            case "Hello":
+            case "hello":
                 speak("Hello");
                 break;
-            case "Turn on lamp 1":
-                // run bör returnera consolens utskrift. Om det returnerade värdet är korrekt körs Speak("Kommandot utfört eller liknande")
-                // som en bekräftelse på utfört kommando.
-                //run("tdtool --on 1"); <-- All nedan i new AsyncTask<Integer, Void, Void>()
+            case "turn on lamp":
+                startAsyncTask("tdtool --on 1");
                 break;
-            case "Turn on lamp 2":
-                //run("tdtool --on 2");
+            case "turn on lamp 2":
+                //startAsycTask("tdtool --on 2");
                 break;
-            case "Turn off lamp 1":
-                //run("tdtool --off 1");
+            case "turn off lamp":
+                //startAsyncTask("tdtool --off 1");
+                startAsyncTask("tdtool --off 1");
                 break;
-            case "Turn off lamp 2":
-                //run("tdtool --off 2");
+            case "turn off lamp 2":
+                //startAsyncTask("tdtool --off 2");
                 break;
-            case "What's the inside temp":
-            case "What is the inside temp":
-                //String temp = run(tdtool --list-sensors);
-                //speak("The inside temperature is " + temp); //Eller k
+            case "what's the inside temp":
+            case "what is the inside temp":
+                startAsyncTask("tdtool --list-sensors");
                 break;
-            case "What's the outside temp":
-            case "What is the outside temp":
+            case "what's the outside temp":
+            case "what is the outside temp":
                 //??????
                 break;
+            default:
+                speak("Sorry, I don't get it!");
         }
     }
 
     public String run(String command) {
-        String hostname = "192.168.0.100";
+        String hostname = "192.168.0.29";
         String username = "pi";
         String password = "voiceit";
         String returnString = "";
@@ -117,11 +117,9 @@ public class MainActivity extends AppCompatActivity {
 
             switch (command) {
                 case "tdtool --list-sensors":
-                    //int i = 0;
                     StringBuilder strB = new StringBuilder();
                     while (true) {
                         String line = br.readLine();
-                        // read line
                         if (line == null) {
                             break;
                         }
@@ -134,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
                     lines = lines[0].split("\\t");
                     lines = lines[4].split("=");
                     returnString =  lines[1];
+                    innerTemp = returnString; //bör hanteras med returvärde istället...Hela metoden behöver ses över.
                 break;
                 case "tdtool --on 1":
                     System.out.println(br.readLine());
@@ -162,7 +161,31 @@ public class MainActivity extends AppCompatActivity {
         }
         return returnString;
     }
-
+    public void startAsyncTask(final String command){
+        new AsyncTask<Integer, Void, Void>() {
+            @Override
+            protected Void doInBackground(Integer... params) {
+                run(command);
+                //your code to fetch results via SSH
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                switch (command){
+                    case "tdtool --on 1":
+                        speak("Lamp has been turned on");
+                        break;
+                    case "tdtool --off 1":
+                        speak("Lamp has been turned off");
+                        break;
+                    case "tdtool --list-sensors":
+                        speak("The temperature is" + innerTemp);
+                }
+                txv_temp_indoor.setText(innerTemp);
+            }
+        }.execute(1);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,71 +206,26 @@ public class MainActivity extends AppCompatActivity {
                 // below you write code to change switch status and action to take
                 if (isChecked) { //do something if checked
                     txv_lighting_status.setText("On");
-                    new AsyncTask<Integer, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Integer... params) {
-                            run("tdtool --on 1");
-                            //your code to fetch results via SSH
-                            return null;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Void aVoid) {
-                            super.onPostExecute(aVoid);
-                            txv_temp_indoor.setText(innerTemp);
-                        }
-                    }.execute(1);
-                    //action
+                    startAsyncTask("tdtool --on 1");
                 } else {
                     txv_lighting_status.setText("Off");
-                    new AsyncTask<Integer, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Integer... params) {
-                            run("tdtool --off 1");
-                            //your code to fetch results via SSH
-                            return null;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Void aVoid) {
-                            super.onPostExecute(aVoid);
-                            txv_temp_indoor.setText(innerTemp);
-                        }
-                    }.execute(1);
-                    //action
+                    startAsyncTask("tdtool --on 1");
                 }
             }
         });
         btnToggle2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // below you write code to change switch status and action to take
-                if (isChecked) { //do something if checked
+                if (isChecked) {
                     txv_heating_status.setText("On");
                     displaySpeechRecognizer();
 
                 } else {
                     txv_heating_status.setText("Off");
-                    //action
+                    displaySpeechRecognizer();
                 }
             }
         });
-//        new AsyncTask<Integer, Void, Void>() {
-//            @Override
-//            protected Void doInBackground(Integer... params) {
-//                run("tdtool --list-sensors");
-//                //your code to fetch results via SSH
-//                return null;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Void aVoid) {
-//                super.onPostExecute(aVoid);
-//                txv_temp_indoor.setText(innerTemp);
-//                Double outdoorDouble = Double.parseDouble(innerTemp) - 10.2;
-//                //txv_temp_outdoor.setText(("" + outdoorDouble).substring(0, 4));
-//            }
-//        }.execute(1);
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
