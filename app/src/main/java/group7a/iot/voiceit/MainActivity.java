@@ -63,20 +63,47 @@ public class MainActivity extends AppCompatActivity {
             List<String> results = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
             String spokenText = results.get(0);
-            if (spokenText.equalsIgnoreCase("hello dumbass")){
-                speak("Hello you little piece of shit!");
-            }else { //hej
-                speak("Hello, you seem like a very nice and wonderful person");
-            }
-            Toast.makeText(MainActivity.this, spokenText, Toast.LENGTH_LONG).show();
+            handleVoiceCommand(spokenText);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void run(String command) {
+    private void handleVoiceCommand(String spokenText) {
+        switch (spokenText) {
+            case "Hello":
+                speak("Hello");
+                break;
+            case "Turn on lamp 1":
+                // run bör returnera consolens utskrift. Om det returnerade värdet är korrekt körs Speak("Kommandot utfört eller liknande")
+                // som en bekräftelse på utfört kommando.
+                //run("tdtool --on 1"); <-- All nedan i new AsyncTask<Integer, Void, Void>()
+                break;
+            case "Turn on lamp 2":
+                //run("tdtool --on 2");
+                break;
+            case "Turn off lamp 1":
+                //run("tdtool --off 1");
+                break;
+            case "Turn off lamp 2":
+                //run("tdtool --off 2");
+                break;
+            case "What's the inside temp":
+            case "What is the inside temp":
+                //String temp = run(tdtool --list-sensors);
+                //speak("The inside temperature is " + temp); //Eller k
+                break;
+            case "What's the outside temp":
+            case "What is the outside temp":
+                //??????
+                break;
+        }
+    }
+
+    public String run(String command) {
         String hostname = "192.168.0.100";
         String username = "pi";
         String password = "voiceit";
+        String returnString = "";
         try {
             Connection conn = new Connection(hostname);//init connection
             conn.connect();//start connection to the hostname
@@ -87,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             sess.execCommand(command);
             InputStream stdout = new StreamGobbler(sess.getStdout());
             BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
+
             switch (command) {
                 case "tdtool --list-sensors":
                     //int i = 0;
@@ -105,15 +133,16 @@ public class MainActivity extends AppCompatActivity {
                     lines = hej.split("\\n");
                     lines = lines[0].split("\\t");
                     lines = lines[4].split("=");
-                    innerTemp = lines[1];
-
-                    break;
+                    returnString =  lines[1];
+                break;
                 case "tdtool --on 1":
                     System.out.println(br.readLine());
-                    break;
+                    returnString = br.readLine();
+                break;
                 case "tdtool --off 1":
                     System.out.println(br.readLine());
-                    break;
+                    returnString = br.readLine();
+                break;
             }
 //        	for (String s : lines){
 //            	System.out.println(s);
@@ -131,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace(System.err);
             System.exit(2);
         }
+        return returnString;
     }
 
     @Override
@@ -193,7 +223,6 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // below you write code to change switch status and action to take
                 if (isChecked) { //do something if checked
-
                     txv_heating_status.setText("On");
                     displaySpeechRecognizer();
 
@@ -238,15 +267,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void speak(String whatToSpeak){
-        //String data = "The temperature is " + innerTemp;
-        //Log.i("TTS", "button clicked: " + data);
-        int speechStatus = textToSpeech.speak(whatToSpeak, TextToSpeech.QUEUE_FLUSH, null);
 
+    private void speak(String whatToSpeak) {
+        int speechStatus = textToSpeech.speak(whatToSpeak, TextToSpeech.QUEUE_FLUSH, null);
         if (speechStatus == TextToSpeech.ERROR) {
             Log.e("TTS", "Error in converting Text to Speech!");
         }
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
