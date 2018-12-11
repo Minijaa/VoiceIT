@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -89,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
             System.exit(2);
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,30 +150,33 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // below you write code to change switch status and action to take
                 if (isChecked) { //do something if checked
+
                     txv_heating_status.setText("On");
                     //action
+
+                    Toast.makeText(MainActivity.this, "Hej", Toast.LENGTH_LONG).show();
                 } else {
                     txv_heating_status.setText("Off");
                     //action
                 }
             }
         });
-        new AsyncTask<Integer, Void, Void>() {
-            @Override
-            protected Void doInBackground(Integer... params) {
-                run("tdtool --list-sensors");
-                //your code to fetch results via SSH
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                txv_temp_indoor.setText(innerTemp);
-                Double outdoorDouble = Double.parseDouble(innerTemp) - 10.2;
-                //txv_temp_outdoor.setText(("" + outdoorDouble).substring(0, 4));
-            }
-        }.execute(1);
+//        new AsyncTask<Integer, Void, Void>() {
+//            @Override
+//            protected Void doInBackground(Integer... params) {
+//                run("tdtool --list-sensors");
+//                //your code to fetch results via SSH
+//                return null;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Void aVoid) {
+//                super.onPostExecute(aVoid);
+//                txv_temp_indoor.setText(innerTemp);
+//                Double outdoorDouble = Double.parseDouble(innerTemp) - 10.2;
+//                //txv_temp_outdoor.setText(("" + outdoorDouble).substring(0, 4));
+//            }
+//        }.execute(1);
 
     }
 }
