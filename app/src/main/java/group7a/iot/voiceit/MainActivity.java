@@ -36,9 +36,11 @@ public class MainActivity extends AppCompatActivity {
     boolean newData = false;
     private String[] lines = new String[1000];
     private volatile String innerTemp = "0";
+    private volatile String outerTemp = "";
     private TextToSpeech textToSpeech;
 
     private static final int SPEECH_REQUEST_CODE = 0;
+
 
     // Create an intent that can start the Speech Recognizer activity
     private void displaySpeechRecognizer() {
@@ -81,20 +83,21 @@ public class MainActivity extends AppCompatActivity {
             case "turn off lamp two":
                 startAsyncTask("tdtool --off 2");
                 break;
-            case "what's the inside temp":
-            case "what is the inside temp":
+            case "what's the temp":
+            case "what is the temp":
                 startAsyncTask("tdtool --list-sensors");
                 break;
-            case "what's the outside temp":
-            case "what is the outside temp":
-                //??????
-                break;
+      //      case "what's the outside temp":
+      //      case "what is the outside temp":
+      //
+      //          break;
             default:
                 speak("Sorry, I don't get it!");
         }
     }
 
     public String run(String command) {
+        //ÄNDRA IP EFTER VARJE UPPKOPPLING
         String hostname = "192.168.0.29";
         String username = "pi";
         String password = "voiceit";
@@ -126,9 +129,10 @@ public class MainActivity extends AppCompatActivity {
                     lines = hej.split("\\n");
                     lines = lines[0].split("\\t");
                     lines = lines[4].split("=");
-                    returnString =  lines[1];
-                    innerTemp = returnString; //bör hanteras med returvärde istället...Hela metoden behöver ses över.
+                    innerTemp = lines[1]; //bör hanteras med returvärde istället...Hela metoden behöver ses över.
+                    outerTemp = lines[2];
                 break;
+                /*
                 case "tdtool --on 1":
                     System.out.println(br.readLine());
                     returnString = br.readLine();
@@ -137,15 +141,8 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println(br.readLine());
                     returnString = br.readLine();
                 break;
+                */
             }
-//        	for (String s : lines){
-//            	System.out.println(s);
-//        	}
-//        	for(String l : lines){
-//            	if(l.matches(".*\\btemperature=[0-9]*.[0-9]+\\b.*"))
-//                	System.out.println("found");
-//
-//        	}
             /* Show exit status, if available (otherwise "null") */
             System.out.println("ExitCode: " + sess.getExitStatus());
             sess.close(); // Close this session
@@ -176,8 +173,10 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case "tdtool --list-sensors":
                         speak("The temperature is" + innerTemp);
+                        speak("The temperature is" + outerTemp);
                 }
                 txv_temp_indoor.setText(innerTemp);
+                txv_temp_outdoor.setText(outerTemp);
             }
         }.execute(1);
     }
