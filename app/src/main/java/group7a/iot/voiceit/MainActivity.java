@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     public String run(String command) {
         //ÄNDRA IP EFTER VARJE UPPKOPPLING
-        String hostname = "192.168.0.29";
+        String hostname = "10.200.58.161";
         String username = "pi";
         String password = "voiceit";
         String returnString = "";
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                     lines = lines[0].split("\\t");
                     lines = lines[4].split("=");
                     innerTemp = lines[1]; //bör hanteras med returvärde istället...Hela metoden behöver ses över.
-                    outerTemp = lines[2];
+                    //outerTemp = lines[2];
                 break;
                 /*
                 case "tdtool --on 1":
@@ -166,14 +166,20 @@ public class MainActivity extends AppCompatActivity {
                 super.onPostExecute(aVoid);
                 switch (command){
                     case "tdtool --on 1":
-                        speak("Lamp has been turned on");
+                        speak("Lamp 1 has been turned on");
+                        break;
+                    case "tdtool --on 2":
+                        speak("Lamp 2 has been turned on");
                         break;
                     case "tdtool --off 1":
-                        speak("Lamp has been turned off");
+                        speak("Lamp 1 has been turned off");
+                        break;
+                    case "tdtool --off 2":
+                        speak("Lamp 2 has been turned off");
                         break;
                     case "tdtool --list-sensors":
                         speak("The temperature is" + innerTemp);
-                        speak("The temperature is" + outerTemp);
+                        //speak("The temperature is" + outerTemp);
                 }
                 txv_temp_indoor.setText(innerTemp);
                 txv_temp_outdoor.setText(outerTemp);
