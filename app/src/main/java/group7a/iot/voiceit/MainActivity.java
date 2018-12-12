@@ -2,13 +2,12 @@ package group7a.iot.voiceit;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -25,9 +24,6 @@ import java.util.Timer;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
-
-import static android.speech.RecognizerIntent.EXTRA_PREFER_OFFLINE;
-import static android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM;
 
 public class MainActivity extends AppCompatActivity {
     TextView txv_temp_indoor = null;
@@ -73,18 +69,17 @@ public class MainActivity extends AppCompatActivity {
             case "hello":
                 speak("Hello");
                 break;
-            case "turn on lamp":
+            case "turn on lamp one":
                 startAsyncTask("tdtool --on 1");
                 break;
-            case "turn on lamp 2":
-                //startAsycTask("tdtool --on 2");
+            case "turn on lamp two":
+                startAsyncTask("tdtool --on 2");
                 break;
-            case "turn off lamp":
-                //startAsyncTask("tdtool --off 1");
+            case "turn off lamp one":
                 startAsyncTask("tdtool --off 1");
                 break;
-            case "turn off lamp 2":
-                //startAsyncTask("tdtool --off 2");
+            case "turn off lamp two":
+                startAsyncTask("tdtool --off 2");
                 break;
             case "what's the inside temp":
             case "what is the inside temp":
