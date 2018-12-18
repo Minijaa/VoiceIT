@@ -71,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
             case "hello":
                 speak("Hello");
                 break;
+            case "turn off lamps":
+                startAsyncTask("tdtool --off 1");
+                startAsyncTask("tdtool --off 2");
+                break;
             case "turn on lamp one":
                 startAsyncTask("tdtool --on 1");
                 break;
@@ -98,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     public String run(String command) {
         //ÄNDRA IP EFTER VARJE UPPKOPPLING
-        String hostname = "10.200.58.161";
+        String hostname = "10.200.18.22";
         String username = "pi";
         String password = "voiceit";
         String returnString = "";
@@ -186,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }.execute(1);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
