@@ -227,8 +227,8 @@ public class MainActivity extends AppCompatActivity {
         txv_temp_indoor.setText("24.5");
         txv_temp_outdoor = (TextView) findViewById(R.id.outdoorTempShow);
         txv_temp_outdoor.setText("14.5");
-        txv_lighting_status = (TextView) findViewById(R.id.outdoorLightShow);
-        txv_heating_status = (TextView) findViewById(R.id.outdoorLightShow2);
+        //txv_lighting_status = (TextView) findViewById(R.id.outdoorLightShow);
+        //txv_heating_status = (TextView) findViewById(R.id.outdoorLightShow2);
         btnToggle = (Switch) findViewById(R.id.btnToggle);
         btnToggle2 = (Switch) findViewById(R.id.btnToggle2);
         btnToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
