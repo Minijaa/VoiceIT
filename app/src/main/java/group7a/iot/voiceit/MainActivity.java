@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     Timer timer = new Timer(true);
     boolean newData = false;
     private String[] lines = new String[1000];
+    private String[] lines2 = new String[1000];
     private volatile String innerTemp = "0";
     private volatile String outerTemp = "";
     private TextToSpeech textToSpeech;
@@ -88,13 +89,16 @@ public class MainActivity extends AppCompatActivity {
                 startAsyncTask("tdtool --off 2");
                 break;
             case "what's the temp":
-            case "what is the temp":
                 startAsyncTask("tdtool --list-sensors");
                 break;
-      //      case "what's the outside temp":
-      //      case "what is the outside temp":
-      //
-      //          break;
+            case "what's the inside temp":
+            case "what is the inside temp":
+                startAsyncTask("tdtool --list-sensors", "in");
+                break;
+            case "what's the outside temp":
+            case "what is the outside temp":
+                startAsyncTask("tdtool --list-sensors", "out");
+                break;
             default:
                 speak("Sorry, I don't get it!");
         }
@@ -133,19 +137,15 @@ public class MainActivity extends AppCompatActivity {
                     lines = hej.split("\\n");
                     lines = lines[0].split("\\t");
                     lines = lines[4].split("=");
+
+                    lines2 = hej.split("\\n");
+                    lines2 = lines2[1].split("\\t");
+                    lines2 = lines2[4].split("=");
+
                     innerTemp = lines[1]; //bör hanteras med returvärde istället...Hela metoden behöver ses över.
-                    //outerTemp = lines[2];
+                    outerTemp = lines2[1];
+
                 break;
-                /*
-                case "tdtool --on 1":
-                    System.out.println(br.readLine());
-                    returnString = br.readLine();
-                break;
-                case "tdtool --off 1":
-                    System.out.println(br.readLine());
-                    returnString = br.readLine();
-                break;
-                */
             }
             /* Show exit status, if available (otherwise "null") */
             System.out.println("ExitCode: " + sess.getExitStatus());
@@ -182,8 +182,34 @@ public class MainActivity extends AppCompatActivity {
                         speak("Lamp 2 has been turned off");
                         break;
                     case "tdtool --list-sensors":
-                        speak("The temperature is" + innerTemp);
-                        //speak("The temperature is" + outerTemp);
+                        speak("The inside temperature is " + innerTemp + " and the outside temperature is " + outerTemp);
+                }
+                txv_temp_indoor.setText(innerTemp);
+                txv_temp_outdoor.setText(outerTemp);
+            }
+        }.execute(1);
+    }
+
+    public void startAsyncTask(final String command, final String setting){
+        new AsyncTask<Integer, Void, Void>() {
+            @Override
+            protected Void doInBackground(Integer... params) {
+                run(command);
+                //your code to fetch results via SSH
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                switch (command){
+                    case "tdtool --list-sensors":
+                        if(setting.equals("in")) {
+                            speak("The temperature is" + innerTemp);
+                        } else if(setting.equals("out")) {
+                            speak("The temperature is" + outerTemp);
+                        } else {
+                            speak("The inside temperature is " + innerTemp + " and the outside temperature is " + outerTemp);
+                        }
                 }
                 txv_temp_indoor.setText(innerTemp);
                 txv_temp_outdoor.setText(outerTemp);
@@ -210,11 +236,15 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // below you write code to change switch status and action to take
                 if (isChecked) { //do something if checked
-                    txv_lighting_status.setText("On");
-                    startAsyncTask("tdtool --on 1");
+//                    txv_lighting_status.setText("On");
+//                    startAsyncTask("tdtool --on 1");
+//                    String spokenText = "what's the temp";
+//                    handleVoiceCommand(spokenText);
                 } else {
-                    txv_lighting_status.setText("Off");
-                    startAsyncTask("tdtool --on 1");
+//                    txv_lighting_status.setText("Off");
+//                    startAsyncTask("tdtool --on 1");
+//                    String spokenText = "what's the outside temp";
+//                    handleVoiceCommand(spokenText);
                 }
             }
         });
