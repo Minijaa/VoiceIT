@@ -24,6 +24,7 @@ import java.util.Timer;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
+import AlizeSpkRec.*;
 
 public class MainActivity extends AppCompatActivity {
     TextView txv_temp_indoor = null;
@@ -65,6 +66,29 @@ public class MainActivity extends AppCompatActivity {
             handleVoiceCommand(spokenText);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void registerAlize() {
+        try {
+            InputStream configAsset = getApplicationContext().getAssets().open("AlizeConfigurationExample.cfg");
+            SimpleSpkDetSystem alizeSystem = new SimpleSpkDetSystem(configAsset, getApplicationContext().getFilesDir().getPath());
+            configAsset.close();
+
+            InputStream backgroundModelAsset = getApplicationContext().getAssets().open("world.gmm");
+            alizeSystem.loadBackgroundModel(backgroundModelAsset);
+            backgroundModelAsset.close();
+            System.out.println("System status:");
+            System.out.println("  # of features: " + alizeSystem.featureCount());   // at this point in our example, 0
+            System.out.println("  # of models: " + alizeSystem.speakerCount());     // at this point in our example, 0
+            System.out.println("  UBM is loaded: " + alizeSystem.isUBMLoaded());    // true, since we just loaded it
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Bobooo1");
+        } catch (AlizeException e) {
+            e.printStackTrace();
+            System.out.println("Bobooo2");
+        }
+
     }
 
     private void handleVoiceCommand(String spokenText) {
@@ -145,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                     innerTemp = lines[1]; //bör hanteras med returvärde istället...Hela metoden behöver ses över.
                     outerTemp = lines2[1];
 
-                break;
+                    break;
             }
             /* Show exit status, if available (otherwise "null") */
             System.out.println("ExitCode: " + sess.getExitStatus());
@@ -157,7 +181,8 @@ public class MainActivity extends AppCompatActivity {
         }
         return returnString;
     }
-    public void startAsyncTask(final String command){
+
+    public void startAsyncTask(final String command) {
         new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... params) {
@@ -165,10 +190,11 @@ public class MainActivity extends AppCompatActivity {
                 //your code to fetch results via SSH
                 return null;
             }
+
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                switch (command){
+                switch (command) {
                     case "tdtool --on 1":
                         speak("Lamp 1 has been turned on");
                         break;
@@ -190,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         }.execute(1);
     }
 
-    public void startAsyncTask(final String command, final String setting){
+    public void startAsyncTask(final String command, final String setting) {
         new AsyncTask<Integer, Void, Void>() {
             @Override
             protected Void doInBackground(Integer... params) {
@@ -198,14 +224,15 @@ public class MainActivity extends AppCompatActivity {
                 //your code to fetch results via SSH
                 return null;
             }
+
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                switch (command){
+                switch (command) {
                     case "tdtool --list-sensors":
-                        if(setting.equals("in")) {
+                        if (setting.equals("in")) {
                             speak("The temperature is" + innerTemp);
-                        } else if(setting.equals("out")) {
+                        } else if (setting.equals("out")) {
                             speak("The temperature is" + outerTemp);
                         } else {
                             speak("The inside temperature is " + innerTemp + " and the outside temperature is " + outerTemp);
@@ -240,6 +267,8 @@ public class MainActivity extends AppCompatActivity {
 //                    startAsyncTask("tdtool --on 1");
 //                    String spokenText = "what's the temp";
 //                    handleVoiceCommand(spokenText);
+                    registerAlize();
+                    System.out.println("test");
                 } else {
 //                    txv_lighting_status.setText("Off");
 //                    startAsyncTask("tdtool --on 1");
