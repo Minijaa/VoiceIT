@@ -12,11 +12,13 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:gravity="center"
         android:padding="10dip"
         android:text="@string/txv_title_temp"
         android:textColor="@color/black_alpha"
         android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,13 +27,14 @@
         android:id="@+id/indoorTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:padding="5dip"
         android:text="@string/txv_indoor_temp"
         android:textColor="@color/black_alpha"
         android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/outdoorTemp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title" />
 
@@ -39,14 +42,13 @@
         android:id="@+id/indoorTempShow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="71dp"
-        android:layout_marginRight="71dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="12dp"
         android:padding="5dip"
         android:text="@string/txv_indoor_temp_show"
         android:textColor="@color/black_alpha"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="@+id/title"
+        app:layout_constraintStart_toEndOf="@+id/indoorTemp"
         app:layout_constraintTop_toBottomOf="@+id/title" />
 
 
@@ -54,98 +56,103 @@
         android:id="@+id/outdoorTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:padding="5dip"
         android:text="@string/txv_outdoor_temp"
         android:textColor="@color/black_alpha"
         android:textSize="20sp"
-        app:layout_constraintBaseline_toBaselineOf="@+id/outdoorTempShow"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/outdoorLight"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/indoorTempShow" />
 
     <TextView
         android:id="@+id/outdoorTempShow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+        android:layout_marginStart="4dp"
         android:padding="5dip"
         android:text="@string/txv_outdoor_temp_show"
         android:textColor="@color/black_alpha"
         android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@+id/indoorTempShow"
-        app:layout_constraintTop_toBottomOf="@+id/indoorTempShow" />
+        app:layout_constraintStart_toEndOf="@+id/outdoorTemp"
+        app:layout_constraintTop_toTopOf="@+id/outdoorTemp" />
 
 
     <TextView
         android:id="@+id/outdoorLight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="108dp"
         android:padding="5dip"
         android:text="@string/txv_outdoor_light"
         android:textColor="@color/black_alpha"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/outdoorTemp" />
+        app:layout_constraintTop_toBottomOf="@+id/title" />
 
     <Switch
         android:id="@+id/btnToggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="3dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="220dp"
         android:textColorLink="@color/colorPrimaryDark"
-        app:layout_constraintBottom_toTopOf="@+id/btnToggle2"
-        app:layout_constraintStart_toStartOf="@+id/btnToggle2" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/outdoorLight"
+        app:layout_constraintTop_toTopOf="@+id/outdoorLight" />
 
 
     <TextView
         android:id="@+id/heater"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:padding="5dip"
         android:text="@string/txv_heater"
         android:textColor="@color/black_alpha"
         android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@+id/outdoorLight"
-        app:layout_constraintTop_toBottomOf="@+id/outdoorLight" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/outdoorLight"
+        app:layout_constraintVertical_bias="0.012" />
 
     <Switch
         android:id="@+id/btnToggle2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="125dp"
-        android:layout_marginLeft="125dp"
-        android:layout_marginEnd="123dp"
-        android:layout_marginRight="123dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="220dp"
         android:textColorLink="@color/colorPrimaryDark"
-        app:layout_constraintBottom_toBottomOf="@+id/heater"
-        app:layout_constraintEnd_toEndOf="@+id/outdoorTempShow"
-        app:layout_constraintStart_toStartOf="@+id/heater" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/heater"
+        app:layout_constraintTop_toTopOf="@+id/heater" />
 
 
     <ImageButton
         android:id="@+id/imageButton2"
-        android:layout_width="89dp"
-        android:layout_height="wrap_content"
+        android:layout_width="157dp"
+        android:layout_height="130dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="109dp"
+        android:layout_marginTop="350dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="108dp"
+        android:layout_marginBottom="10dp"
         android:adjustViewBounds="false"
+        android:backgroundTint="@color/activitybackground"
         android:baselineAlignBottom="false"
-        android:cropToPadding="false"
+        android:cropToPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/outdoorLight"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/voiceiticon" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/voiceit" />
 
 </android.support.constraint.ConstraintLayout>
