@@ -3,6 +3,7 @@ package group7a.iot.voiceit;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
@@ -17,9 +18,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
@@ -32,8 +34,6 @@ public class MainActivity extends AppCompatActivity {
     TextView txv_heating_status = null;
     Switch btnToggle = null;
     Switch btnToggle2 = null;
-    Timer timer = new Timer(true);
-    boolean newData = false;
     private String[] lines = new String[1000];
     private String[] lines2 = new String[1000];
     private volatile String innerTemp = "0";
@@ -67,8 +67,42 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private String handleInput(String spokenText) {
+        String[] inputTextTemp = spokenText.split(" ");
+        ArrayList<String> inputText = new ArrayList<String>(Arrays.asList(inputTextTemp));
+//        int time = Integer.parseInt(inputText.get(inputText.size()-1));
+//        time = time*1000;
+        String command = "";
+        if(android.text.TextUtils.isDigitsOnly(inputText.get(inputText.size()-1))) {
+            for(int i = 0; i < inputText.size()-1; i++) {
+                command += inputText.get(i);
+                if(i < inputText.size()-2) {
+                    command += " ";
+                }
+            }
+            return command;
+        } else {
+            for (int i = 0; i < inputText.size(); i++) {
+                command += inputText.get(i);
+                if (i < inputText.size()-1) {
+                    command += " ";
+                }
+            }
+            return command;
+        }
+    }
+
+
     private void handleVoiceCommand(String spokenText) {
-        switch (spokenText) {
+        final Handler handler = new Handler();
+        int time = spokenText.charAt(spokenText.length()-1);
+        String command = handleInput(spokenText);
+
+        String temp = String.valueOf(time);
+
+        Log.i("My_Tag" ," time: " + temp + " command:" + command);
+
+        switch (command) {
             case "hello":
                 speak("Hello");
                 break;
@@ -98,6 +132,42 @@ public class MainActivity extends AppCompatActivity {
             case "what's the outside temp":
             case "what is the outside temp":
                 startAsyncTask("tdtool --list-sensors", "out");
+                break;
+            case "turn on lamp one timer":
+//                Context cont = this;
+//                LampService LS = new LampService(cont, "tdtool --on 1");
+//                Intent LI = new Intent(cont, LS.getClass());
+//                startService(LI);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAsyncTask("tdtool --on 1");
+                    }
+                }, time);
+                break;
+            case "turn on lamp two timer":
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAsyncTask("tdtool --on 2");
+                    }
+                }, time);
+                break;
+            case "turn off lamp one timer":
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAsyncTask("tdtool --off 1");
+                    }
+                }, time);
+                break;
+            case "turn off lamp two timer":
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAsyncTask("tdtool --off 2");
+                    }
+                }, time);
                 break;
             default:
                 speak("Sorry, I don't get it!");
@@ -182,10 +252,10 @@ public class MainActivity extends AppCompatActivity {
                         speak("Lamp 2 has been turned off");
                         break;
                     case "tdtool --list-sensors":
+                        txv_temp_indoor.setText(innerTemp);
+                        txv_temp_outdoor.setText(outerTemp);
                         speak("The inside temperature is " + innerTemp + " and the outside temperature is " + outerTemp);
                 }
-                txv_temp_indoor.setText(innerTemp);
-                txv_temp_outdoor.setText(outerTemp);
             }
         }.execute(1);
     }
@@ -240,10 +310,15 @@ public class MainActivity extends AppCompatActivity {
 //                    startAsyncTask("tdtool --on 1");
 //                    String spokenText = "what's the temp";
 //                    handleVoiceCommand(spokenText);
+ //                   String spokenText = "turn on lamp one timer 3";
+ //                   String spokenText = "what's the temp";
+ //                   handleVoiceCommand(spokenText);
                 } else {
 //                    txv_lighting_status.setText("Off");
 //                    startAsyncTask("tdtool --on 1");
 //                    String spokenText = "what's the outside temp";
+//                    handleVoiceCommand(spokenText);
+//                    String spokenText = "turn off lamp one timer 3";
 //                    handleVoiceCommand(spokenText);
                 }
             }
@@ -297,3 +372,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
