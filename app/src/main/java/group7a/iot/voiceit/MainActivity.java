@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private TextToSpeech textToSpeech;
     private SimpleSpkDetSystem alizeSystem;
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    SpeakerRecognition mSpeakerRecognition = new SpeakerRecognition();
 
     private static final int SPEECH_REQUEST_CODE = 0;
 
@@ -666,6 +667,9 @@ public class MainActivity extends AppCompatActivity {
                 mediaPlayer.setDataSource(getApplicationContext(), uri);
                 mediaPlayer.prepare();
                 mediaPlayer.start();
+                System.out.println("NU ska vi hoppa in i speakrrecognition!");
+                //mSpeakerRecognition.httpRequest(fileToSend);
+                //BOBO!
 
             } catch (IOException ex) {
                 // Rethrow but we still close accessWave in our finally
