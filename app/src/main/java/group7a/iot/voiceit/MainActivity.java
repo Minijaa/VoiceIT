@@ -33,22 +33,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-<<<<<<< HEAD
-import java.util.ArrayList;
-import java.util.Arrays;
-=======
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
->>>>>>> 46e2f3cd4a867132b2711b647a48b8b6fd3f26c1
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import AlizeSpkRec.AlizeException;
+import AlizeSpkRec.SimpleSpkDetSystem;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
-import AlizeSpkRec.*;
 
 public class MainActivity extends AppCompatActivity {
     TextView txv_temp_indoor = null;
@@ -57,11 +55,8 @@ public class MainActivity extends AppCompatActivity {
     TextView txv_heating_status = null;
     Switch btnToggle = null;
     Switch btnToggle2 = null;
-<<<<<<< HEAD
-=======
     //Timer timer = new Timer(true);
     boolean newData = false;
->>>>>>> 46e2f3cd4a867132b2711b647a48b8b6fd3f26c1
     private String[] lines = new String[1000];
     private String[] lines2 = new String[1000];
     private volatile String innerTemp = "0";
@@ -109,7 +104,29 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-<<<<<<< HEAD
+    private void initiatieAlize() {
+        try {
+            InputStream configAsset = getApplicationContext().getAssets().open("AlizeConfigurationExample.cfg");
+            alizeSystem = new SimpleSpkDetSystem(configAsset, getApplicationContext().getFilesDir().getPath());
+            configAsset.close();
+
+            InputStream backgroundModelAsset = getApplicationContext().getAssets().open("world.gmm");
+            alizeSystem.loadBackgroundModel(backgroundModelAsset);
+            backgroundModelAsset.close();
+            System.out.println("System status:");
+            System.out.println("  # of features: " + alizeSystem.featureCount());   // at this point in our example, 0
+            System.out.println("  # of models: " + alizeSystem.speakerCount());     // at this point in our example, 0
+            System.out.println("  UBM is loaded: " + alizeSystem.isUBMLoaded());    // true, since we just loaded it
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Bobooo1");
+        } catch (AlizeException e) {
+            e.printStackTrace();
+            System.out.println("Bobooo2");
+        }
+    }
+
+
     private String handleInput(String spokenText) {
         String[] inputTextTemp = spokenText.split(" ");
         ArrayList<String> inputText = new ArrayList<String>(Arrays.asList(inputTextTemp));
@@ -135,30 +152,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-=======
-    private void initiatieAlize() {
-        try {
-            InputStream configAsset = getApplicationContext().getAssets().open("AlizeConfigurationExample.cfg");
-            alizeSystem = new SimpleSpkDetSystem(configAsset, getApplicationContext().getFilesDir().getPath());
-            configAsset.close();
-
-            InputStream backgroundModelAsset = getApplicationContext().getAssets().open("world.gmm");
-            alizeSystem.loadBackgroundModel(backgroundModelAsset);
-            backgroundModelAsset.close();
-            System.out.println("System status:");
-            System.out.println("  # of features: " + alizeSystem.featureCount());   // at this point in our example, 0
-            System.out.println("  # of models: " + alizeSystem.speakerCount());     // at this point in our example, 0
-            System.out.println("  UBM is loaded: " + alizeSystem.isUBMLoaded());    // true, since we just loaded it
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Bobooo1");
-        } catch (AlizeException e) {
-            e.printStackTrace();
-            System.out.println("Bobooo2");
-        }
-
-    }
->>>>>>> 46e2f3cd4a867132b2711b647a48b8b6fd3f26c1
 
     private void handleVoiceCommand(String spokenText) {
         final Handler handler = new Handler();
@@ -167,9 +160,9 @@ public class MainActivity extends AppCompatActivity {
 
         String temp = String.valueOf(time);
 
-        Log.i("My_Tag" ," time: " + temp + " command:" + command);
+            Log.i("My_Tag" ," time: " + temp + " command:" + command);
 
-        switch (command) {
+            switch (command) {
             case "hello":
                 speak("Hello");
                 break;
@@ -201,10 +194,10 @@ public class MainActivity extends AppCompatActivity {
                 startAsyncTask("tdtool --list-sensors", "out");
                 break;
             case "turn on lamp one timer":
-//                Context cont = this;
-//                LampService LS = new LampService(cont, "tdtool --on 1");
-//                Intent LI = new Intent(cont, LS.getClass());
-//                startService(LI);
+    //                Context cont = this;
+    //                LampService LS = new LampService(cont, "tdtool --on 1");
+    //                Intent LI = new Intent(cont, LS.getClass());
+    //                startService(LI);
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -240,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
                 speak("Sorry, I don't get it!");
         }
     }
+
 
     public String run(String command) {
         //ÄNDRA IP EFTER VARJE UPPKOPPLING
@@ -321,10 +315,10 @@ public class MainActivity extends AppCompatActivity {
                         speak("Lamp 2 has been turned off");
                         break;
                     case "tdtool --list-sensors":
-                        txv_temp_indoor.setText(innerTemp);
-                        txv_temp_outdoor.setText(outerTemp);
                         speak("The inside temperature is " + innerTemp + " and the outside temperature is " + outerTemp);
                 }
+                txv_temp_indoor.setText(innerTemp);
+                txv_temp_outdoor.setText(outerTemp);
             }
         }.execute(1);
     }
@@ -390,11 +384,6 @@ public class MainActivity extends AppCompatActivity {
 //                    startAsyncTask("tdtool --on 1");
 //                    String spokenText = "what's the temp";
 //                    handleVoiceCommand(spokenText);
-<<<<<<< HEAD
- //                   String spokenText = "turn on lamp one timer 3";
- //                   String spokenText = "what's the temp";
- //                   handleVoiceCommand(spokenText);
-=======
 
 //                    try {
 //                        mSoundRecorder.record(3000);
@@ -415,22 +404,16 @@ public class MainActivity extends AppCompatActivity {
                     launchTask();
 
                     System.out.println("test");
->>>>>>> 46e2f3cd4a867132b2711b647a48b8b6fd3f26c1
                 } else {
 //                    txv_lighting_status.setText("Off");
 //                    startAsyncTask("tdtool --on 1");
 //                    String spokenText = "what's the outside temp";
 //                    handleVoiceCommand(spokenText);
-<<<<<<< HEAD
-//                    String spokenText = "turn off lamp one timer 3";
-//                    handleVoiceCommand(spokenText);
-=======
                     if (!recordTask.isCancelled() && recordTask.getStatus() == AsyncTask.Status.RUNNING) {
                         recordTask.cancel(false);
                     } else {
                         Toast.makeText(MainActivity.this, "Task not running.", Toast.LENGTH_SHORT).show();
                     }
->>>>>>> 46e2f3cd4a867132b2711b647a48b8b6fd3f26c1
                 }
             }
         });
@@ -492,10 +475,6 @@ public class MainActivity extends AppCompatActivity {
             textToSpeech.shutdown();
         }
     }
-<<<<<<< HEAD
-}
-
-=======
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -808,4 +787,3 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
->>>>>>> 46e2f3cd4a867132b2711b647a48b8b6fd3f26c1
