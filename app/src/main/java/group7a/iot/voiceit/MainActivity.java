@@ -12,6 +12,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.os.SystemClock;
 import android.speech.RecognizerIntent;
@@ -36,14 +37,16 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
 
+import AlizeSpkRec.AlizeException;
+import AlizeSpkRec.SimpleSpkDetSystem;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
-import AlizeSpkRec.*;
 
 public class MainActivity extends AppCompatActivity {
     TextView txv_temp_indoor = null;
@@ -122,11 +125,45 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             System.out.println("Bobooo2");
         }
-
     }
 
+
+    private String handleInput(String spokenText) {
+        String[] inputTextTemp = spokenText.split(" ");
+        ArrayList<String> inputText = new ArrayList<String>(Arrays.asList(inputTextTemp));
+//        int time = Integer.parseInt(inputText.get(inputText.size()-1));
+//        time = time*1000;
+        String command = "";
+        if(android.text.TextUtils.isDigitsOnly(inputText.get(inputText.size()-1))) {
+            for(int i = 0; i < inputText.size()-1; i++) {
+                command += inputText.get(i);
+                if(i < inputText.size()-2) {
+                    command += " ";
+                }
+            }
+            return command;
+        } else {
+            for (int i = 0; i < inputText.size(); i++) {
+                command += inputText.get(i);
+                if (i < inputText.size()-1) {
+                    command += " ";
+                }
+            }
+            return command;
+        }
+    }
+
+
     private void handleVoiceCommand(String spokenText) {
-        switch (spokenText) {
+        final Handler handler = new Handler();
+        int time = spokenText.charAt(spokenText.length()-1);
+        String command = handleInput(spokenText);
+
+        String temp = String.valueOf(time);
+
+            Log.i("My_Tag" ," time: " + temp + " command:" + command);
+
+            switch (command) {
             case "hello":
                 speak("Hello");
                 break;
@@ -157,10 +194,47 @@ public class MainActivity extends AppCompatActivity {
             case "what is the outside temp":
                 startAsyncTask("tdtool --list-sensors", "out");
                 break;
+            case "turn on lamp one timer":
+    //                Context cont = this;
+    //                LampService LS = new LampService(cont, "tdtool --on 1");
+    //                Intent LI = new Intent(cont, LS.getClass());
+    //                startService(LI);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAsyncTask("tdtool --on 1");
+                    }
+                }, time);
+                break;
+            case "turn on lamp two timer":
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAsyncTask("tdtool --on 2");
+                    }
+                }, time);
+                break;
+            case "turn off lamp one timer":
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAsyncTask("tdtool --off 1");
+                    }
+                }, time);
+                break;
+            case "turn off lamp two timer":
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startAsyncTask("tdtool --off 2");
+                    }
+                }, time);
+                break;
             default:
                 speak("Sorry, I don't get it!");
         }
     }
+
 
     public String run(String command) {
         //ÄNDRA IP EFTER VARJE UPPKOPPLING
