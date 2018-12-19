@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -75,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_RECORD_AUDIO = 0;
     private MainActivity.RecordWaveTask recordTask = null;
     private File fileToSend;
+
+    public File getFileToSend() {
+        return fileToSend;
+    }
     //private SoundRecorder mSoundRecorder = new SoundRecorder();
 
     // Create an intent that can start the Speech Recognizer activity
@@ -529,16 +536,16 @@ public class MainActivity extends AppCompatActivity {
         return recordTask;
     }
 
-    private static class RecordWaveTask extends AsyncTask<File, Void, Object[]> {
+    private class RecordWaveTask extends AsyncTask<File, Void, Object[]> {
 
         // Configure me!
-        private static final int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
-        private static final int SAMPLE_RATE = 16000; // Hz
-        private static final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
-        private static final int CHANNEL_MASK = AudioFormat.CHANNEL_IN_MONO;
+        private final int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
+        private final int SAMPLE_RATE = 16000; // Hz
+        private final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
+        private final int CHANNEL_MASK = AudioFormat.CHANNEL_IN_MONO;
         //
 
-        private static final int BUFFER_SIZE = 2 * AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_MASK, ENCODING);
+        private final int BUFFER_SIZE = 2 * AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_MASK, ENCODING);
 
         private Context ctx;
 
@@ -617,6 +624,7 @@ public class MainActivity extends AppCompatActivity {
                 if (wavOut != null) {
                     try {
                         wavOut.close();
+
                     } catch (IOException ex) {
                         //
                     }
@@ -644,7 +652,7 @@ public class MainActivity extends AppCompatActivity {
          * @param encoding    An AudioFormat.ENCODING_PCM_* value
          * @throws IOException
          */
-        private static void writeWavHeader(OutputStream out, int channelMask, int sampleRate, int encoding) throws IOException {
+        private void writeWavHeader(OutputStream out, int channelMask, int sampleRate, int encoding) throws IOException {
             short channels;
             switch (channelMask) {
                 case AudioFormat.CHANNEL_IN_MONO:
@@ -685,7 +693,7 @@ public class MainActivity extends AppCompatActivity {
          * @param bitDepth   The bit depth
          * @throws IOException
          */
-        private static void writeWavHeader(OutputStream out, short channels, int sampleRate, short bitDepth) throws IOException {
+        private void writeWavHeader(OutputStream out, short channels, int sampleRate, short bitDepth) throws IOException {
             // Convert the multi-byte integers to raw bytes in little endian format as required by the spec
             byte[] littleBytes = ByteBuffer
                     .allocate(14)
@@ -724,7 +732,7 @@ public class MainActivity extends AppCompatActivity {
          * @param wav The wav file to update
          * @throws IOException
          */
-        private static void updateWavHeader(File wav) throws IOException {
+        private void updateWavHeader(File wav) throws IOException {
             byte[] sizes = ByteBuffer
                     .allocate(8)
                     .order(ByteOrder.LITTLE_ENDIAN)
@@ -746,6 +754,14 @@ public class MainActivity extends AppCompatActivity {
                 // Subchunk2Size
                 accessWave.seek(40);
                 accessWave.write(sizes, 4, 4);
+                fileToSend = wav;
+                Uri uri = Uri.parse(fileToSend.getAbsolutePath());
+                MediaPlayer mediaPlayer = new MediaPlayer();
+                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mediaPlayer.setDataSource(getApplicationContext(), uri);
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+
             } catch (IOException ex) {
                 // Rethrow but we still close accessWave in our finally
                 throw ex;
