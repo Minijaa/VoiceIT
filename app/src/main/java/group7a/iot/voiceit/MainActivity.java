@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Create an intent that can start the Speech Recognizer activity
 
-    private void displaySpeechRecognizer() {
+    private void activateVoiceRecognition() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en_US");
         intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
@@ -100,7 +100,11 @@ public class MainActivity extends AppCompatActivity {
             List<String> results = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
             String spokenText = results.get(0);
-            handleVoiceCommand(spokenText);
+            try {
+                handleVoiceCommand(spokenText);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -154,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void handleVoiceCommand(String spokenText) {
+    private void handleVoiceCommand(String spokenText) throws InterruptedException {
         final Handler handler = new Handler();
         int time = spokenText.charAt(spokenText.length()-1);
         String command = handleInput(spokenText);
@@ -175,7 +179,8 @@ public class MainActivity extends AppCompatActivity {
                 startAsyncTask("tdtool --on 1");
                 break;
             case "turn on lamp two":
-                startAsyncTask("tdtool --on 2");
+                speak("Please repeat your identification phrase.", 1);
+                //startAsyncTask("tdtool --on 2");
                 break;
             case "turn off lamp one":
                 startAsyncTask("tdtool --off 1");
@@ -238,7 +243,8 @@ public class MainActivity extends AppCompatActivity {
 
     public String run(String command) {
         //ÄNDRA IP EFTER VARJE UPPKOPPLING
-        String hostname = "10.200.18.22";
+        //String hostname = "10.200.18.22";
+        String hostname = "192.168.0.31";
         String username = "pi";
         String password = "voiceit";
         String returnString = "";
@@ -386,13 +392,13 @@ public class MainActivity extends AppCompatActivity {
 //                    String spokenText = "what's the temp";
 //                    handleVoiceCommand(spokenText);
 
-//                    try {
-//                        mSoundRecorder.record(3000);
-//
-//                    } catch (Exception e) {
-//                        System.out.println("BobooRecord");
-//                        e.printStackTrace();
-//                    }
+                    try {
+                        //mSoundRecorder.record(3000);
+
+                    } catch (Exception e) {
+                        System.out.println("BobooRecord");
+                        e.printStackTrace();
+                    }
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
                             != PackageManager.PERMISSION_GRANTED) {
                         // Request permission
@@ -402,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     // Permission already available
-                    launchTask();
+                    activateSoundRecording(); //STARTA LJUDINSPELNING
 
                     System.out.println("test");
                 } else {
@@ -423,11 +429,12 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     //txv_heating_status.setText("On");
-                    displaySpeechRecognizer();
+                    activateVoiceRecognition();
+                    //mSpeakerRecognition.createProfile();
 
                 } else {
                     //txv_heating_status.setText("Off");
-                    displaySpeechRecognizer();
+                    activateVoiceRecognition();
                 }
             }
         });
@@ -463,6 +470,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void speak(String whatToSpeak) {
         int speechStatus = textToSpeech.speak(whatToSpeak, TextToSpeech.QUEUE_FLUSH, null);
+
+        if (speechStatus == TextToSpeech.ERROR) {
+            Log.e("TTS", "Error in converting Text to Speech!");
+        }
+    }
+    private void speak(String whatToSpeak, int i) throws InterruptedException {
+        int speechStatus = textToSpeech.speak(whatToSpeak, TextToSpeech.QUEUE_FLUSH, null);
+        Thread.sleep(2000);
+        System.out.println("Awake");
+        activateSoundRecording();
+
+        Thread.sleep(4000);
+        //nedan kod borde vara en metod
+        if (!recordTask.isCancelled() && recordTask.getStatus() == AsyncTask.Status.RUNNING) {
+            recordTask.cancel(false);
+        } else {
+            Toast.makeText(MainActivity.this, "Task not running.", Toast.LENGTH_SHORT).show();
+        }
         if (speechStatus == TextToSpeech.ERROR) {
             Log.e("TTS", "Error in converting Text to Speech!");
         }
@@ -483,7 +508,7 @@ public class MainActivity extends AppCompatActivity {
             case PERMISSION_RECORD_AUDIO:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission granted
-                    launchTask();
+                    activateSoundRecording();
                 } else {
                     // Permission denied
                     Toast.makeText(this, "\uD83D\uDE41", Toast.LENGTH_SHORT).show();
@@ -492,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void launchTask() {
+    private void activateSoundRecording() {
         switch (recordTask.getStatus()) {
             case RUNNING:
                 Toast.makeText(this, "Task already running...", Toast.LENGTH_SHORT).show();
@@ -735,14 +760,15 @@ public class MainActivity extends AppCompatActivity {
                 accessWave.seek(40);
                 accessWave.write(sizes, 4, 4);
                 fileToSend = wav;
-                Uri uri = Uri.parse(fileToSend.getAbsolutePath());
-                MediaPlayer mediaPlayer = new MediaPlayer();
-                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                mediaPlayer.setDataSource(getApplicationContext(), uri);
-                mediaPlayer.prepare();
-                mediaPlayer.start();
+                //Ta med koden nedan om du vill höra din inspelning
+//                Uri uri = Uri.parse(fileToSend.getAbsolutePath());
+//                MediaPlayer mediaPlayer = new MediaPlayer();
+//                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//                mediaPlayer.setDataSource(getApplicationContext(), uri);
+//                mediaPlayer.prepare();
+//                mediaPlayer.start();
                 System.out.println("NU ska vi hoppa in i speakrrecognition!");
-                //mSpeakerRecognition.httpRequest(fileToSend);
+
                 //BOBO!
 
             } catch (IOException ex) {
@@ -768,6 +794,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Object[] results) {
             Throwable throwable = null;
+            boolean returnValue = mSpeakerRecognition.verifySpeaker(fileToSend);
+            if (returnValue){
+                speak("Approved");
+                startAsyncTask("tdtool --on 2");
+            }else {
+                speak("Access denied");
+            }
             if (results[0] instanceof Throwable) {
                 // Error
                 throwable = (Throwable) results[0];

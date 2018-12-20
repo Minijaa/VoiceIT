@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "group7a.iot.voiceit"
@@ -11,6 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        useLibrary 'org.apache.http.legacy'
     }
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
@@ -40,8 +41,7 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
-    compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.6'
+    compile 'com.squareup.okhttp3:okhttp:3.12.0'
     testCompile 'junit:junit:4.12'
     compile files('libs/SSH library.jar')
 }

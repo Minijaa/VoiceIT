@@ -1,65 +1,84 @@
 package group7a.iot.voiceit;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.net.URI;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-
-
+import java.io.IOException;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class SpeakerRecognition {
+    //VerificationProfileID för Samuel är = 5ce07214-c2c8-4799-83b2-45c334750e52
+    private OkHttpClient client = new OkHttpClient();
 
-    public void httpRequest(File file) {
-        System.out.println("Innan kommer vi hit.");
-        CloseableHttpClient httpclient = null;
+    public void createProfile() {
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType, "{\"locale\":\"en-us\"}");
+        Request request = new Request.Builder()
+                .url("https://westus.api.cognitive.microsoft.com/spid/v1.0/verificationProfiles")
+                .post(body)
+                .addHeader("Ocp-Apim-Subscription-Key", "ac4d7534bab4421fb7116f7013811296")
+                .addHeader("Content-Type", "application/json")
+                .build();
+
         try {
-            httpclient = HttpClients.createDefault();
-            System.out.println("Den senasdte");
-        }catch (Exception e){
-            System.out.println("KRASH!!!1");
+            Response response = client.newCall(request).execute();
+            System.out.println(response);
+            System.out.println(response.body().string());
+        } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("KRASH!!!2");
-
         }
-        System.out.println("Kommer vi hit=?");
+    }
+
+    public void createEnrollment(File file) {
+        MediaType mediaType = MediaType.parse("multipart/form-data");
+        RequestBody body = RequestBody.create(mediaType, file);
+        Request request = new Request.Builder()
+                .url("https://westus.api.cognitive.microsoft.com/spid/v1.0/verificationProfiles/{5ce07214-c2c8-4799-83b2-45c334750e52}/enroll")
+                .post(body)
+                .addHeader("Ocp-Apim-Subscription-Key", "ac4d7534bab4421fb7116f7013811296")
+                .addHeader("Content-Type", "multipart/form-data")
+                .build();
+
         try {
-            System.out.println("Booo or Baaa?");
-            URIBuilder builder = new URIBuilder("https://westus.api.cognitive.microsoft.com/spid/v1.0/verify?verificationProfileId={21787816-261d-4703-97c2-e866f54c5975}");
-            MultipartEntityBuilder mpBuilder = MultipartEntityBuilder.create();
-            mpBuilder.addBinaryBody("file", new FileInputStream(file), ContentType.APPLICATION_OCTET_STREAM, file.getName());
-            URI uri = builder.build();
-
-            HttpPost request = new HttpPost(uri);
-            request.setHeader("Content-Type", "multipart/form-data");
-            request.setHeader("Ocp-Apim-Subscription-Key", "{b7efa04012d54db2abea9a10494cfca2}");
-            HttpEntity multipart = mpBuilder.build();
-
-            request.setEntity(multipart);
-            // Request body
-//            StringEntity reqEntity = new StringEntity("{body}");
-//            request.setEntity(reqEntity);
-
-            HttpResponse response = httpclient.execute(request);
-            HttpEntity responseEntity = response.getEntity();
-
-            if (responseEntity != null) {
-                System.out.println(EntityUtils.toString(responseEntity));
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println("BOBOOO!!!!");
+            Response response = client.newCall(request).execute();
+            System.out.println(response);
+            System.out.println(response.body().string());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    public boolean verifySpeaker(File file) {
+        MediaType mediaType = MediaType.parse("multipart/form-data");
+        RequestBody body = RequestBody.create(mediaType, file);
+        Request request = new Request.Builder()
+                .url("https://westus.api.cognitive.microsoft.com/spid/v1.0/verify?verificationProfileId={5ce07214-c2c8-4799-83b2-45c334750e52}")
+                .post(body)
+                .addHeader("Ocp-Apim-Subscription-Key", "ac4d7534bab4421fb7116f7013811296")
+                .addHeader("Content-Type", "multipart/form-data")
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            System.out.println(response);
+            String responseString = response.body().string();
+            System.out.println(responseString);
+
+            String[] responseArray = responseString.split("\\n");
+            responseArray = responseArray[1].split(": ");
+            responseArray = responseArray[1].split("\"");
+            responseArray = responseArray[1].split("\"");
+            String status = responseArray[0];
+            if ("Accept".equals(status)) {
+                System.out.println("ACCEPT!!!");
+                return true;
+            }
+            response.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
