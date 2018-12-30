@@ -65,16 +65,10 @@ public class SpeakerRecognition {
             System.out.println(response);
             String responseString = response.body().string();
             System.out.println(responseString);
-
-            String[] responseArray = responseString.split("\\n");
-            responseArray = responseArray[1].split(": ");
-            responseArray = responseArray[1].split("\"");
-            responseArray = responseArray[1].split("\"");
-            String status = responseArray[0];
-            if ("Accept".equals(status)) {
-                System.out.println("ACCEPT!!!");
+            if (responseString.contains("Accept") && responseString.contains("High")){
                 return true;
             }
+
             response.close();
         } catch (IOException e) {
             e.printStackTrace();

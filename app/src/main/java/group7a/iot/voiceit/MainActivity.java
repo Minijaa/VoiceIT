@@ -51,18 +51,11 @@ import ch.ethz.ssh2.StreamGobbler;
 public class MainActivity extends AppCompatActivity {
     TextView txv_temp_indoor = null;
     TextView txv_temp_outdoor = null;
-    TextView txv_lighting_status = null;
-    TextView txv_heating_status = null;
     Switch btnToggle = null;
     Switch btnToggle2 = null;
-    //Timer timer = new Timer(true);
-    boolean newData = false;
-    private String[] lines = new String[1000];
-    private String[] lines2 = new String[1000];
     private volatile String innerTemp = "0";
     private volatile String outerTemp = "";
     private TextToSpeech textToSpeech;
-    private SimpleSpkDetSystem alizeSystem;
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     SpeakerRecognition mSpeakerRecognition = new SpeakerRecognition();
 
@@ -74,11 +67,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_RECORD_AUDIO = 0;
     private MainActivity.RecordWaveTask recordTask = null;
     private File fileToSend;
-
-    public File getFileToSend() {
-        return fileToSend;
-    }
-    //private SoundRecorder mSoundRecorder = new SoundRecorder();
 
     // Create an intent that can start the Speech Recognizer activity
 
@@ -109,29 +97,6 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void initiatieAlize() {
-        try {
-            InputStream configAsset = getApplicationContext().getAssets().open("AlizeConfigurationExample.cfg");
-            alizeSystem = new SimpleSpkDetSystem(configAsset, getApplicationContext().getFilesDir().getPath());
-            configAsset.close();
-
-            InputStream backgroundModelAsset = getApplicationContext().getAssets().open("world.gmm");
-            alizeSystem.loadBackgroundModel(backgroundModelAsset);
-            backgroundModelAsset.close();
-            System.out.println("System status:");
-            System.out.println("  # of features: " + alizeSystem.featureCount());   // at this point in our example, 0
-            System.out.println("  # of models: " + alizeSystem.speakerCount());     // at this point in our example, 0
-            System.out.println("  UBM is loaded: " + alizeSystem.isUBMLoaded());    // true, since we just loaded it
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Bobooo1");
-        } catch (AlizeException e) {
-            e.printStackTrace();
-            System.out.println("Bobooo2");
-        }
-    }
-
-
     private String handleInput(String spokenText) {
         String[] inputTextTemp = spokenText.split(" ");
         ArrayList<String> inputText = new ArrayList<String>(Arrays.asList(inputTextTemp));
@@ -157,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private void handleVoiceCommand(String spokenText) throws InterruptedException {
         final Handler handler = new Handler();
         int time = spokenText.charAt(spokenText.length()-1);
@@ -179,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 startAsyncTask("tdtool --on 1");
                 break;
             case "turn on lamp two":
+                //Start second speak-methods which initiates speaker recognition
                 speak("Please repeat your identification phrase.", 1);
                 //startAsyncTask("tdtool --on 2");
                 break;
@@ -249,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
         String password = "voiceit";
         String returnString = "";
         try {
-            Connection conn = new Connection(hostname);//init connection
-            conn.connect();//start connection to the hostname
+            Connection conn = new Connection(hostname);
+            conn.connect();
             boolean isAuthenticated = conn.authenticateWithPassword(username, password);
             if (!isAuthenticated)
                 throw new IOException("Authentication failed.");
@@ -272,11 +237,11 @@ public class MainActivity extends AppCompatActivity {
                         System.out.println(line);
                     }
                     String hej = strB.toString();
-                    lines = hej.split("\\n");
+                    String[] lines = hej.split("\\n");
                     lines = lines[0].split("\\t");
                     lines = lines[4].split("=");
 
-                    lines2 = hej.split("\\n");
+                    String[] lines2 = hej.split("\\n");
                     lines2 = lines2[1].split("\\t");
                     lines2 = lines2[4].split("=");
 
@@ -285,9 +250,8 @@ public class MainActivity extends AppCompatActivity {
 
                     break;
             }
-            /* Show exit status, if available (otherwise "null") */
             System.out.println("ExitCode: " + sess.getExitStatus());
-            sess.close(); // Close this session
+            sess.close();
             conn.close();
         } catch (IOException e) {
             e.printStackTrace(System.err);
@@ -301,7 +265,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected Void doInBackground(Integer... params) {
                 run(command);
-                //your code to fetch results via SSH
                 return null;
             }
 
@@ -335,7 +298,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected Void doInBackground(Integer... params) {
                 run(command);
-                //your code to fetch results via SSH
                 return null;
             }
 
@@ -365,35 +327,21 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-//        //mSoundRecorder.reset();
-//        try {
-//            mSoundRecorder.config(getFilesDir().getAbsolutePath(), 16000, 1, 16) ;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            System.out.println("Boboo");
-//        }
 
         txv_temp_indoor = (TextView) findViewById(R.id.indoorTempShow);
         txv_temp_indoor.setText("24.5");
         txv_temp_outdoor = (TextView) findViewById(R.id.outdoorTempShow);
         txv_temp_outdoor.setText("14.5");
-        //txv_lighting_status = (TextView) findViewById(R.id.outdoorLightShow);
-        //txv_heating_status = (TextView) findViewById(R.id.outdoorLightShow2);
         btnToggle = (Switch) findViewById(R.id.btnToggle);
         btnToggle2 = (Switch) findViewById(R.id.btnToggle2);
 
+        //Ta bort denna knapp och allt den innehåller när vi inte behöver
+        //testa speaker recognition utan raspberry pi längre
         btnToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // below you write code to change switch status and action to take
-                if (isChecked) { //do something if checked
-//                    txv_lighting_status.setText("On");
-//                    startAsyncTask("tdtool --on 1");
-//                    String spokenText = "what's the temp";
-//                    handleVoiceCommand(spokenText);
-
+                if (isChecked) {
                     try {
-                        //mSoundRecorder.record(3000);
 
                     } catch (Exception e) {
                         System.out.println("BobooRecord");
@@ -428,12 +376,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    //txv_heating_status.setText("On");
                     activateVoiceRecognition();
-                    //mSpeakerRecognition.createProfile();
 
                 } else {
-                    //txv_heating_status.setText("Off");
                     activateVoiceRecognition();
                 }
             }
@@ -458,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-        initiatieAlize();
+        //initiatieAlize();
         // Restore the previous task or create a new one if necessary
         recordTask = (MainActivity.RecordWaveTask) getLastCustomNonConfigurationInstance();
         if (recordTask == null) {
@@ -475,14 +420,16 @@ public class MainActivity extends AppCompatActivity {
             Log.e("TTS", "Error in converting Text to Speech!");
         }
     }
+    //Second speak-method for speaker recognition commands
     private void speak(String whatToSpeak, int i) throws InterruptedException {
         int speechStatus = textToSpeech.speak(whatToSpeak, TextToSpeech.QUEUE_FLUSH, null);
         Thread.sleep(2000);
-        System.out.println("Awake");
         activateSoundRecording();
 
+        //Wait for password-phrase
         Thread.sleep(4000);
-        //nedan kod borde vara en metod
+
+        //Stop recording
         if (!recordTask.isCancelled() && recordTask.getStatus() == AsyncTask.Status.RUNNING) {
             recordTask.cancel(false);
         } else {
@@ -543,17 +490,14 @@ public class MainActivity extends AppCompatActivity {
 
     private class RecordWaveTask extends AsyncTask<File, Void, Object[]> {
 
-        // Configure me!
+        // Sound file settings.
         private final int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
         private final int SAMPLE_RATE = 16000; // Hz
         private final int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
         private final int CHANNEL_MASK = AudioFormat.CHANNEL_IN_MONO;
-        //
 
         private final int BUFFER_SIZE = 2 * AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_MASK, ENCODING);
-
         private Context ctx;
-
         private RecordWaveTask(Context ctx) {
             setContext(ctx);
         }
@@ -620,7 +564,6 @@ public class MainActivity extends AppCompatActivity {
                             endTime = SystemClock.elapsedRealtime();
                         }
                     } catch (IllegalStateException ex) {
-                        //
                     }
                     if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
                         audioRecord.release();
@@ -631,7 +574,6 @@ public class MainActivity extends AppCompatActivity {
                         wavOut.close();
 
                     } catch (IOException ex) {
-                        //
                     }
                 }
             }
@@ -767,9 +709,7 @@ public class MainActivity extends AppCompatActivity {
 //                mediaPlayer.setDataSource(getApplicationContext(), uri);
 //                mediaPlayer.prepare();
 //                mediaPlayer.start();
-                System.out.println("NU ska vi hoppa in i speakrrecognition!");
-
-                //BOBO!
+                System.out.println("Running speaker recognition module!");
 
             } catch (IOException ex) {
                 // Rethrow but we still close accessWave in our finally
@@ -794,9 +734,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Object[] results) {
             Throwable throwable = null;
+            //Send recorded file to speaker recognition module. The returned boolean indicates
+            //wheter the voice phrase was accepted or not.
             boolean returnValue = mSpeakerRecognition.verifySpeaker(fileToSend);
             if (returnValue){
-                speak("Approved");
+                speak("Access granted");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 startAsyncTask("tdtool --on 2");
             }else {
                 speak("Access denied");
