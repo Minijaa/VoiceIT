@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#22bec3</color>
-    <color name="colorPrimaryDark">#187c8f</color>
+    <color name="colorPrimaryDark">#5CBABF</color> //#187c8f
     <color name="colorAccent">#FF4081</color>
-    <color name="black_alpha">#000000</color>
+    <color name="black_alpha">#ffffff</color>
     <color name="text_box_background">#E7E7E7</color>
     <color name="blue_text">#0166ff</color>
     <color name="title_bar_color">#22bec3</color>
-    <color name="activitybackground">#ffffff</color>
+    <color name="activitybackground">#5CBABF</color>
     <color name="activityfont">#3f3f3f</color>
 </resources>

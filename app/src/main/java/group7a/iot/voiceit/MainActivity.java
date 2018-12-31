@@ -5,11 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioRecord;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,7 +19,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,8 +41,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import AlizeSpkRec.AlizeException;
-import AlizeSpkRec.SimpleSpkDetSystem;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
@@ -52,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txv_temp_indoor = null;
     TextView txv_temp_outdoor = null;
     Switch btnToggle = null;
-    Switch btnToggle2 = null;
+    ImageButton mainButton = null;
     private volatile String innerTemp = "0";
     private volatile String outerTemp = "";
     private TextToSpeech textToSpeech;
@@ -333,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
         txv_temp_outdoor = (TextView) findViewById(R.id.outdoorTempShow);
         txv_temp_outdoor.setText("14.5");
         btnToggle = (Switch) findViewById(R.id.btnToggle);
-        btnToggle2 = (Switch) findViewById(R.id.btnToggle2);
+        mainButton = (ImageButton) findViewById(R.id.micButton);
 
         //Ta bort denna knapp och allt den innehåller när vi inte behöver
         //testa speaker recognition utan raspberry pi längre
@@ -372,15 +369,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        btnToggle2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mainButton.setOnClickListener(new CompoundButton.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    activateVoiceRecognition();
-
-                } else {
-                    activateVoiceRecognition();
-                }
+            public void onClick(View view) {
+                activateVoiceRecognition();
             }
         });
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {

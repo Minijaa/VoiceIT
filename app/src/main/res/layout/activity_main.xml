@@ -8,151 +8,69 @@
     android:background="@color/activitybackground">
 
 
-    <TextView
-        android:id="@+id/title"
+    <ImageView
+        android:id="@+id/VoiceItLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:gravity="center"
-        android:padding="10dip"
-        android:text="@string/txv_title_temp"
-        android:textColor="@color/black_alpha"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="32dp"
+        android:adjustViewBounds="true"
 
+        android:cropToPadding="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/voice_it_logo"/>
 
-    <TextView
-        android:id="@+id/indoorTemp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:padding="5dip"
-        android:text="@string/txv_indoor_temp"
-        android:textColor="@color/black_alpha"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/outdoorTemp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
 
     <TextView
         android:id="@+id/indoorTempShow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="12dp"
-        android:padding="5dip"
-        android:text="@string/txv_indoor_temp_show"
-        android:textColor="@color/black_alpha"
-        android:textSize="20sp"
-        app:layout_constraintStart_toEndOf="@+id/indoorTemp"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
-
-
-    <TextView
-        android:id="@+id/outdoorTemp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
         android:padding="5dip"
-        android:text="@string/txv_outdoor_temp"
-        android:textColor="@color/black_alpha"
+        android:text="@string/txv_indoor_temp_show"
+        android:textColor="#FFFFFF"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/outdoorLight"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/indoorTempShow" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/outdoorTempShow"/>
+
 
     <TextView
         android:id="@+id/outdoorTempShow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
         android:padding="5dip"
         android:text="@string/txv_outdoor_temp_show"
-        android:textColor="@color/black_alpha"
+        android:textColor="#FFFFFF"
         android:textSize="20sp"
-        app:layout_constraintStart_toEndOf="@+id/outdoorTemp"
-        app:layout_constraintTop_toTopOf="@+id/outdoorTemp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-
-    <TextView
-        android:id="@+id/outdoorLight"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="108dp"
-        android:padding="5dip"
-        android:text="@string/txv_outdoor_light"
-        android:textColor="@color/black_alpha"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
 
     <Switch
         android:id="@+id/btnToggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="220dp"
-        android:textColorLink="@color/colorPrimaryDark"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/outdoorLight"
-        app:layout_constraintTop_toTopOf="@+id/outdoorLight" />
-
-
-    <TextView
-        android:id="@+id/heater"
-        android:layout_width="wrap_content"
-        android:layout_height="37dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:padding="5dip"
-        android:text="@string/txv_heater"
-        android:textColor="@color/black_alpha"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/outdoorLight"
-        app:layout_constraintVertical_bias="0.012" />
-
-    <Switch
-        android:id="@+id/btnToggle2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="220dp"
         android:textColorLink="@color/colorPrimaryDark"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/heater"
-        app:layout_constraintTop_toTopOf="@+id/heater" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/indoorTempShow"
+        />
 
 
     <ImageButton
-        android:id="@+id/imageButton2"
-        android:layout_width="157dp"
-        android:layout_height="130dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="350dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="10dp"
-        android:adjustViewBounds="false"
-        android:backgroundTint="@color/activitybackground"
-        android:baselineAlignBottom="false"
-        android:cropToPadding="true"
+        android:id="@+id/micButton"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+
+        android:background="@drawable/mic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/voiceit" />
+        app:layout_constraintTop_toBottomOf="@+id/VoiceItLogo"
+        app:layout_constraintVertical_bias="0.35000002"/>
 
 </android.support.constraint.ConstraintLayout>
