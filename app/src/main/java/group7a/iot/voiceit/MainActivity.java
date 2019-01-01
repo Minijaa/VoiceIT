@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
     private TextToSpeech textToSpeech;
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     SpeakerRecognition mSpeakerRecognition = new SpeakerRecognition();
-
     private static final int SPEECH_REQUEST_CODE = 0;
 
     // Requesting permission to RECORD_AUDIO
@@ -100,10 +99,10 @@ public class MainActivity extends AppCompatActivity {
 //        int time = Integer.parseInt(inputText.get(inputText.size()-1));
 //        time = time*1000;
         String command = "";
-        if(android.text.TextUtils.isDigitsOnly(inputText.get(inputText.size()-1))) {
-            for(int i = 0; i < inputText.size()-1; i++) {
+        if (android.text.TextUtils.isDigitsOnly(inputText.get(inputText.size() - 1))) {
+            for (int i = 0; i < inputText.size() - 1; i++) {
                 command += inputText.get(i);
-                if(i < inputText.size()-2) {
+                if (i < inputText.size() - 2) {
                     command += " ";
                 }
             }
@@ -111,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             for (int i = 0; i < inputText.size(); i++) {
                 command += inputText.get(i);
-                if (i < inputText.size()-1) {
+                if (i < inputText.size() - 1) {
                     command += " ";
                 }
             }
@@ -121,14 +120,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleVoiceCommand(String spokenText) throws InterruptedException {
         final Handler handler = new Handler();
-        int time = spokenText.charAt(spokenText.length()-1);
+        int time = spokenText.charAt(spokenText.length() - 1);
         String command = handleInput(spokenText);
 
         String temp = String.valueOf(time);
 
-            Log.i("My_Tag" ," time: " + temp + " command:" + command);
+        Log.i("My_Tag", " time: " + temp + " command:" + command);
 
-            switch (command) {
+        switch (command) {
             case "hello":
                 speak("Hello");
                 break;
@@ -162,10 +161,10 @@ public class MainActivity extends AppCompatActivity {
                 startAsyncTask("tdtool --list-sensors", "out");
                 break;
             case "turn on lamp one timer":
-    //                Context cont = this;
-    //                LampService LS = new LampService(cont, "tdtool --on 1");
-    //                Intent LI = new Intent(cont, LS.getClass());
-    //                startService(LI);
+                //                Context cont = this;
+                //                LampService LS = new LampService(cont, "tdtool --on 1");
+                //                Intent LI = new Intent(cont, LS.getClass());
+                //                startService(LI);
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -326,9 +325,7 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         txv_temp_indoor = (TextView) findViewById(R.id.indoorTempShow);
-        txv_temp_indoor.setText("24.5");
         txv_temp_outdoor = (TextView) findViewById(R.id.outdoorTempShow);
-        txv_temp_outdoor.setText("14.5");
         btnToggle = (Switch) findViewById(R.id.btnToggle);
         mainButton = (ImageButton) findViewById(R.id.micButton);
 
@@ -370,6 +367,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mainButton.setOnClickListener(new CompoundButton.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 activateVoiceRecognition();
@@ -412,6 +410,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e("TTS", "Error in converting Text to Speech!");
         }
     }
+
     //Second speak-method for speaker recognition commands
     private void speak(String whatToSpeak, int i) throws InterruptedException {
         int speechStatus = textToSpeech.speak(whatToSpeak, TextToSpeech.QUEUE_FLUSH, null);
@@ -490,6 +489,7 @@ public class MainActivity extends AppCompatActivity {
 
         private final int BUFFER_SIZE = 2 * AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_MASK, ENCODING);
         private Context ctx;
+
         private RecordWaveTask(Context ctx) {
             setContext(ctx);
         }
@@ -729,7 +729,7 @@ public class MainActivity extends AppCompatActivity {
             //Send recorded file to speaker recognition module. The returned boolean indicates
             //wheter the voice phrase was accepted or not.
             boolean returnValue = mSpeakerRecognition.verifySpeaker(fileToSend);
-            if (returnValue){
+            if (returnValue) {
                 speak("Access granted");
                 try {
                     Thread.sleep(1000);
@@ -737,7 +737,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 startAsyncTask("tdtool --on 2");
-            }else {
+            } else {
                 speak("Access denied");
             }
             if (results[0] instanceof Throwable) {
