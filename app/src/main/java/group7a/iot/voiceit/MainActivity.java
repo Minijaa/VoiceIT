@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -121,13 +124,16 @@ public class MainActivity extends AppCompatActivity {
         String[] temporary = spokenText.split(" ");
         String k = temporary[temporary.length-2];
         int digit = 0;
+
         try {
             digit = Integer.parseInt(k);
-            if (temporary[temporary.length-1].equals("hours") || temporary[temporary.length-1].equals("hour")) {
+            speak("The lamp will be turned " + temporary[1] + " in " + digit + temporary[temporary.length-1]);
+            if (temporary[temporary.length-1].equalsIgnoreCase("hours") || temporary[temporary.length-1].equalsIgnoreCase("hour")) {
                 digit = digit * 3600000;
-            } else if (temporary[temporary.length-1].equals("minutes") || temporary[temporary.length-1].equals("minute")) {
+
+            } else if (temporary[temporary.length-1].equalsIgnoreCase("minutes") || temporary[temporary.length-1].equalsIgnoreCase("minute")) {
                 digit = digit * 60000;
-            } else if (temporary[temporary.length-1].equals("seconds") || temporary[temporary.length-1].equals("second")) {
+            } else if (temporary[temporary.length-1].equalsIgnoreCase("seconds") || temporary[temporary.length-1].equalsIgnoreCase("second")) {
                 digit = digit * 1000;
             }
             return digit;
@@ -175,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "turn on lamp two":
                 //Start second speak-methods which initiates speaker recognition
-                speak("Please repeat your identification phrase.", 1);
+                speak("Please repeat your password phrase.", 1);
                 //startAsyncTask("tdtool --on 2");
                 break;
             case "turn off lamp one":
@@ -383,6 +389,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    activateSoundRecording(); //STARTA LJUDINSPELNING
+                    //mSpeakerRecognition.createProfile();
+                } else {
+
 /*                    try {
 
                     } catch (Exception e) {
@@ -398,20 +408,10 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     // Permission already available
-                    activateSoundRecording(); //STARTA LJUDINSPELNING
+
 */
-                    String spokenText = "turn on lamp one timer 2 seconds";
-                    try {
-                        handleVoiceCommand(spokenText);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("test");
-                } else {
-//                    txv_lighting_status.setText("Off");
-//                    startAsyncTask("tdtool --on 1");
-//                    String spokenText = "what's the outside temp";
-//                    handleVoiceCommand(spokenText);
+                    //mSpeakerRecognition.createProfile();
+
                     if (!recordTask.isCancelled() && recordTask.getStatus() == AsyncTask.Status.RUNNING) {
                         recordTask.cancel(false);
                     } else {
@@ -781,6 +781,7 @@ public class MainActivity extends AppCompatActivity {
             Throwable throwable = null;
             //Send recorded file to speaker recognition module. The returned boolean indicates
             //wheter the voice phrase was accepted or not.
+            //mSpeakerRecognition.createEnrollment(fileToSend);
             boolean returnValue = mSpeakerRecognition.verifySpeaker(fileToSend);
             if (returnValue) {
                 speak("Access granted");
