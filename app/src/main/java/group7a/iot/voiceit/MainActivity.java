@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> inputText = new ArrayList<String>(Arrays.asList(inputTextTemp));
 
         String command = "";
-<<<<<<< HEAD
 
         for(int i = 0; i < inputText.size()-2; i++) {
             command += inputText.get(i);
@@ -122,12 +121,8 @@ public class MainActivity extends AppCompatActivity {
         /*
         if(android.text.TextUtils.isDigitsOnly(inputText.get(inputText.size()-1))) {
             for(int i = 0; i < inputText.size()-1; i++) {
-=======
-        if (android.text.TextUtils.isDigitsOnly(inputText.get(inputText.size() - 1))) {
-            for (int i = 0; i < inputText.size() - 1; i++) {
->>>>>>> 9cbde87d1e13d8efb46d25c7e993e5f41587cca2
                 command += inputText.get(i);
-                if (i < inputText.size() - 2) {
+                if(i < inputText.size()-2) {
                     command += " ";
                 }
             }
@@ -135,16 +130,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             for (int i = 0; i < inputText.size(); i++) {
                 command += inputText.get(i);
-                if (i < inputText.size() - 1) {
+                if (i < inputText.size()-1) {
                     command += " ";
                 }
             }
             return command;
         }
         */
-
-
-
     }
 
     private int handleTimerTime(String spokenText) {
@@ -173,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleVoiceCommand(String spokenText) throws InterruptedException {
         final Handler handler = new Handler();
-<<<<<<< HEAD
         String command = "";
         int time = 0;
         Log.i("My_Tag", "fel?: " + spokenText );
@@ -181,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
             time = handleTimerTime(spokenText);
             String tempCommand = handleInput(spokenText);
             command = tempCommand.substring(0, tempCommand.lastIndexOf(" "));
-      //      timeIdentifier = tempCommand.substring(tempCommand.lastIndexOf(" ") + 1);
+            //      timeIdentifier = tempCommand.substring(tempCommand.lastIndexOf(" ") + 1);
             //        String temp = String.valueOf(time);
             /*
             if (timeIdentifier.equals("hours") || timeIdentifier.equals("hour")) {
@@ -197,15 +188,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             command = spokenText;
         }
-            Log.i("My_Tag" ," time: " + time + " command:" + command);
-=======
-        int time = spokenText.charAt(spokenText.length() - 1);
-        String command = handleInput(spokenText);
-
-        String temp = String.valueOf(time);
-
-        Log.i("My_Tag", " time: " + temp + " command:" + command);
->>>>>>> 9cbde87d1e13d8efb46d25c7e993e5f41587cca2
+        Log.i("My_Tag" ," time: " + time + " command:" + command);
 
         switch (command) {
             case "hello":
