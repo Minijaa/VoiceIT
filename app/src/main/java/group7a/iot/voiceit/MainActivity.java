@@ -107,9 +107,7 @@ public class MainActivity extends AppCompatActivity {
     private String handleInput(String spokenText) {
         String[] inputTextTemp = spokenText.split(" ");
         ArrayList<String> inputText = new ArrayList<String>(Arrays.asList(inputTextTemp));
-
         String command = "";
-
         for(int i = 0; i < inputText.size()-2; i++) {
             command += inputText.get(i);
             if(i < inputText.size()-2) {
@@ -123,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
         String[] temporary = spokenText.split(" ");
         String k = temporary[temporary.length-2];
         int digit = 0;
-      //  Log.i("My_Tag", "key: " + k);
         try {
             digit = Integer.parseInt(k);
             if (temporary[temporary.length-1].equals("hours") || temporary[temporary.length-1].equals("hour")) {
@@ -133,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
             } else if (temporary[temporary.length-1].equals("seconds") || temporary[temporary.length-1].equals("second")) {
                 digit = digit * 1000;
             }
-            //       Log.i("My_Tag", "tid" + digit);
             return digit;
         } catch (NumberFormatException e) {
             if(textNumbers.containsKey(k)) {
@@ -146,13 +142,11 @@ public class MainActivity extends AppCompatActivity {
                 } else if (temporary[temporary.length-1].equals("seconds") || temporary[temporary.length-1].equals("second")) {
                     digit = digit * 1000;
                 }
-                //       Log.i("My_Tag", "tid" + digit);
                 return digit;
             } else {
                 return digit;
             }
         }
-
     }
 
     private void handleVoiceCommand(String spokenText) throws InterruptedException {
@@ -160,8 +154,6 @@ public class MainActivity extends AppCompatActivity {
         String command;
         String tempCommand;
         int time = 0;
-        Log.i("My_Tag", "fel?: " + spokenText );
-
         if(spokenText.contains(" ") && (spokenText.substring(0, spokenText.indexOf(' ')).equals("turn") && spokenText.contains("timer"))) {
             time = handleTimerTime(spokenText);
             tempCommand = handleInput(spokenText);
@@ -169,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             command = spokenText;
         }
-        Log.i("My_Tag" ," time: " + time + " command:" + command);
 
         switch (command) {
             case "hello":
@@ -206,10 +197,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "turn on lamp one timer":
             case "turn on lamp1 timer":
-                //                Context cont = this;
-                //                LampService LS = new LampService(cont, "tdtool --on 1");
-                //                Intent LI = new Intent(cont, LS.getClass());
-                //                startService(LI);
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -291,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
                     lines2 = lines2[1].split("\\t");
                     lines2 = lines2[4].split("=");
 
-                    innerTemp = lines[1]; //bör hanteras med returvärde istället...Hela metoden behöver ses över.
+                    innerTemp = lines[1];
                     outerTemp = lines2[1];
 
                     break;
@@ -379,13 +366,12 @@ public class MainActivity extends AppCompatActivity {
         for(String e : mapNumbers) {
             textNumbers.put(e, counter);
             counter++;
-
         }
 
-        txv_temp_indoor = (TextView) findViewById(R.id.indoorTempShow);
-        txv_temp_outdoor = (TextView) findViewById(R.id.outdoorTempShow);
-        btnToggle = (Switch) findViewById(R.id.btnToggle);
-        mainButton = (ImageButton) findViewById(R.id.micButton);
+        txv_temp_indoor = findViewById(R.id.indoorTempShow);
+        txv_temp_outdoor = findViewById(R.id.outdoorTempShow);
+        btnToggle = findViewById(R.id.btnToggle);
+        mainButton = findViewById(R.id.micButton);
 
         //Ta bort denna knapp och allt den innehåller när vi inte behöver
         //testa speaker recognition utan raspberry pi längre
@@ -431,7 +417,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mainButton.setOnClickListener(new CompoundButton.OnClickListener() {
-
             @Override
             public void onClick(View view) {
                 activateVoiceRecognition();
@@ -825,5 +810,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }
