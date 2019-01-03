@@ -229,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
                 }, time);
                 break;
             case "turn off lamp one timer":
+            case "turn off lamp1 timer":
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -410,7 +411,7 @@ public class MainActivity extends AppCompatActivity {
                     // Permission already available
                     activateSoundRecording(); //STARTA LJUDINSPELNING
 */
-                    String spokenText = "turn off lamp one timer one minute";
+                    String spokenText = "turn on lamp one timer 2 seconds";
                     try {
                         handleVoiceCommand(spokenText);
                     } catch (InterruptedException e) {
