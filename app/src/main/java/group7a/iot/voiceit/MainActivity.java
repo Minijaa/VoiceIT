@@ -157,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleVoiceCommand(String spokenText) throws InterruptedException {
         final Handler handler = new Handler();
-        String command = "";
-        String tempCommand = "";
+        String command;
+        String tempCommand;
         int time = 0;
         Log.i("My_Tag", "fel?: " + spokenText );
 
@@ -213,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-
                         startAsyncTask("tdtool --on 1");
                     }
                 }, time);
