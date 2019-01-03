@@ -117,74 +117,55 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return command + inputText.get(inputText.size()-1);
-
-        /*
-        if(android.text.TextUtils.isDigitsOnly(inputText.get(inputText.size()-1))) {
-            for(int i = 0; i < inputText.size()-1; i++) {
-                command += inputText.get(i);
-                if(i < inputText.size()-2) {
-                    command += " ";
-                }
-            }
-            return command;
-        } else {
-            for (int i = 0; i < inputText.size(); i++) {
-                command += inputText.get(i);
-                if (i < inputText.size()-1) {
-                    command += " ";
-                }
-            }
-            return command;
-        }
-        */
     }
 
     private int handleTimerTime(String spokenText) {
         String[] temporary = spokenText.split(" ");
         String k = temporary[temporary.length-2];
         int digit = 0;
-        Log.i("My_Tag", "key: " + k);
-
-        if(textNumbers.containsKey(k)) {
-            digit = textNumbers.get(k);
-            Log.i("My_Tag", "value: " + digit);
+      //  Log.i("My_Tag", "key: " + k);
+        try {
+            digit = Integer.parseInt(k);
             if (temporary[temporary.length-1].equals("hours") || temporary[temporary.length-1].equals("hour")) {
                 digit = digit * 3600000;
-            } else if (temporary[temporary.length-1].equals("minutes") || temporary[temporary.length-1].equals("minutes")) {
-                Log.i("My_Tag", "tid" + digit);
+            } else if (temporary[temporary.length-1].equals("minutes") || temporary[temporary.length-1].equals("minute")) {
                 digit = digit * 60000;
-                Log.i("My_Tag", "tid2" + digit);
             } else if (temporary[temporary.length-1].equals("seconds") || temporary[temporary.length-1].equals("second")) {
                 digit = digit * 1000;
             }
+            //       Log.i("My_Tag", "tid" + digit);
             return digit;
-        } else {
-            return digit;
+        } catch (NumberFormatException e) {
+            if(textNumbers.containsKey(k)) {
+                digit = textNumbers.get(k);
+                Log.i("My_Tag", "value: " + digit);
+                if (temporary[temporary.length-1].equals("hours") || temporary[temporary.length-1].equals("hour")) {
+                    digit = digit * 3600000;
+                } else if (temporary[temporary.length-1].equals("minutes") || temporary[temporary.length-1].equals("minute")) {
+                    digit = digit * 60000;
+                } else if (temporary[temporary.length-1].equals("seconds") || temporary[temporary.length-1].equals("second")) {
+                    digit = digit * 1000;
+                }
+                //       Log.i("My_Tag", "tid" + digit);
+                return digit;
+            } else {
+                return digit;
+            }
         }
+
     }
 
     private void handleVoiceCommand(String spokenText) throws InterruptedException {
         final Handler handler = new Handler();
         String command = "";
+        String tempCommand = "";
         int time = 0;
         Log.i("My_Tag", "fel?: " + spokenText );
+
         if(spokenText.contains(" ") && (spokenText.substring(0, spokenText.indexOf(' ')).equals("turn") && spokenText.contains("timer"))) {
             time = handleTimerTime(spokenText);
-            String tempCommand = handleInput(spokenText);
+            tempCommand = handleInput(spokenText);
             command = tempCommand.substring(0, tempCommand.lastIndexOf(" "));
-            //      timeIdentifier = tempCommand.substring(tempCommand.lastIndexOf(" ") + 1);
-            //        String temp = String.valueOf(time);
-            /*
-            if (timeIdentifier.equals("hours") || timeIdentifier.equals("hour")) {
-                time = time * 3600000;
-            } else if (timeIdentifier.equals("minutes") || timeIdentifier.equals("minutes")) {
-                Log.i("My_Tag", "tid" + time);
-                time = time * 60000;
-                Log.i("My_Tag", "tid2" + time);
-            } else if (timeIdentifier.equals("seconds") || timeIdentifier.equals("second")) {
-                time = time * 1000;
-            }
-            */
         } else {
             command = spokenText;
         }
@@ -224,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 startAsyncTask("tdtool --list-sensors", "out");
                 break;
             case "turn on lamp one timer":
+            case "turn on lamp1 timer":
                 //                Context cont = this;
                 //                LampService LS = new LampService(cont, "tdtool --on 1");
                 //                Intent LI = new Intent(cont, LS.getClass());
@@ -231,11 +213,14 @@ public class MainActivity extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+
                         startAsyncTask("tdtool --on 1");
                     }
                 }, time);
                 break;
             case "turn on lamp two timer":
+            case "turn on lamp2 timer":
+            case "turn on lamp to timer":
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -252,6 +237,8 @@ public class MainActivity extends AppCompatActivity {
                 }, time);
                 break;
             case "turn off lamp two timer":
+            case "turn off lamp2 timer":
+            case "turn off lamp to timer":
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -268,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
     public String run(String command) {
         //ÄNDRA IP EFTER VARJE UPPKOPPLING
         //String hostname = "10.200.18.22";
-        String hostname = "192.168.0.31";
+        String hostname = "10.200.11.154";
         String username = "pi";
         String password = "voiceit";
         String returnString = "";
@@ -423,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
                     // Permission already available
                     activateSoundRecording(); //STARTA LJUDINSPELNING
 */
-                    String spokenText = "turn on lamp one timer two minutes";
+                    String spokenText = "turn off lamp one timer one minute";
                     try {
                         handleVoiceCommand(spokenText);
                     } catch (InterruptedException e) {
