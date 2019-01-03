@@ -16,7 +16,6 @@ import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -38,8 +37,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
@@ -64,6 +65,16 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_RECORD_AUDIO = 0;
     private MainActivity.RecordWaveTask recordTask = null;
     private File fileToSend;
+
+    //hashmap with all numbers in text-form
+    private Map<String, Integer> textNumbers = new HashMap<>();
+    private List<String> mapNumbers = Arrays.asList("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"
+            , "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twentyone"
+            , "twentytwo", "twentythree", "twentyfour", "twentyfive", "twentysix", "twentyseven", "twentyeight", "twentynine", "thirty"
+            , "thirtyone", "thirtytwo", "thirtythree", "thirtyfour", "thirtyfive", "thirtysix", "thirtyseven", "thirtyeight", "thirtynine"
+            , "fourty", "fourtyone", "fourtytwo", "fourtythree", "fourtyfour", "fourtyfive", "fourtysix", "fourtyseven", "sourtyeight", "fourtynine"
+            , "fifty", "fiftyone", "fiftytwo", "fiftythree", "fiftyfour", "fiftyfive", "fiftysix", "fiftyseven", "fiftyeight", "fiftynine");
+
 
     // Create an intent that can start the Speech Recognizer activity
 
@@ -97,9 +108,18 @@ public class MainActivity extends AppCompatActivity {
     private String handleInput(String spokenText) {
         String[] inputTextTemp = spokenText.split(" ");
         ArrayList<String> inputText = new ArrayList<String>(Arrays.asList(inputTextTemp));
-//        int time = Integer.parseInt(inputText.get(inputText.size()-1));
-//        time = time*1000;
+
         String command = "";
+
+        for(int i = 0; i < inputText.size()-2; i++) {
+            command += inputText.get(i);
+            if(i < inputText.size()-2) {
+                command += " ";
+            }
+        }
+        return command + inputText.get(inputText.size()-1);
+
+        /*
         if(android.text.TextUtils.isDigitsOnly(inputText.get(inputText.size()-1))) {
             for(int i = 0; i < inputText.size()-1; i++) {
                 command += inputText.get(i);
@@ -117,16 +137,62 @@ public class MainActivity extends AppCompatActivity {
             }
             return command;
         }
+        */
+
+
+
+    }
+
+    private int handleTimerTime(String spokenText) {
+        String[] temporary = spokenText.split(" ");
+        String k = temporary[temporary.length-2];
+        int digit = 0;
+        Log.i("My_Tag", "key: " + k);
+
+        if(textNumbers.containsKey(k)) {
+            digit = textNumbers.get(k);
+            Log.i("My_Tag", "value: " + digit);
+            if (temporary[temporary.length-1].equals("hours") || temporary[temporary.length-1].equals("hour")) {
+                digit = digit * 3600000;
+            } else if (temporary[temporary.length-1].equals("minutes") || temporary[temporary.length-1].equals("minutes")) {
+                Log.i("My_Tag", "tid" + digit);
+                digit = digit * 60000;
+                Log.i("My_Tag", "tid2" + digit);
+            } else if (temporary[temporary.length-1].equals("seconds") || temporary[temporary.length-1].equals("second")) {
+                digit = digit * 1000;
+            }
+            return digit;
+        } else {
+            return digit;
+        }
     }
 
     private void handleVoiceCommand(String spokenText) throws InterruptedException {
         final Handler handler = new Handler();
-        int time = spokenText.charAt(spokenText.length()-1);
-        String command = handleInput(spokenText);
-
-        String temp = String.valueOf(time);
-
-            Log.i("My_Tag" ," time: " + temp + " command:" + command);
+        String command = "";
+        int time = 0;
+        Log.i("My_Tag", "fel?: " + spokenText );
+        if(spokenText.contains(" ") && (spokenText.substring(0, spokenText.indexOf(' ')).equals("turn") && spokenText.contains("timer"))) {
+            time = handleTimerTime(spokenText);
+            String tempCommand = handleInput(spokenText);
+            command = tempCommand.substring(0, tempCommand.lastIndexOf(" "));
+      //      timeIdentifier = tempCommand.substring(tempCommand.lastIndexOf(" ") + 1);
+            //        String temp = String.valueOf(time);
+            /*
+            if (timeIdentifier.equals("hours") || timeIdentifier.equals("hour")) {
+                time = time * 3600000;
+            } else if (timeIdentifier.equals("minutes") || timeIdentifier.equals("minutes")) {
+                Log.i("My_Tag", "tid" + time);
+                time = time * 60000;
+                Log.i("My_Tag", "tid2" + time);
+            } else if (timeIdentifier.equals("seconds") || timeIdentifier.equals("second")) {
+                time = time * 1000;
+            }
+            */
+        } else {
+            command = spokenText;
+        }
+            Log.i("My_Tag" ," time: " + time + " command:" + command);
 
             switch (command) {
             case "hello":
@@ -169,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        Log.i("My_Tag", "timerlamp");
                         startAsyncTask("tdtool --on 1");
                     }
                 }, time);
@@ -325,6 +392,14 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        //populate hashmap with digits
+        int counter = 1;
+        for(String e : mapNumbers) {
+            textNumbers.put(e, counter);
+            counter++;
+
+        }
+
         txv_temp_indoor = (TextView) findViewById(R.id.indoorTempShow);
         txv_temp_indoor.setText("24.5");
         txv_temp_outdoor = (TextView) findViewById(R.id.outdoorTempShow);
@@ -338,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    try {
+/*                    try {
 
                     } catch (Exception e) {
                         System.out.println("BobooRecord");
@@ -354,7 +429,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     // Permission already available
                     activateSoundRecording(); //STARTA LJUDINSPELNING
-
+*/
+                    String spokenText = "turn on lamp one timer two minutes";
+                    try {
+                        handleVoiceCommand(spokenText);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println("test");
                 } else {
 //                    txv_lighting_status.setText("Off");
