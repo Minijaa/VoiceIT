@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "turn on lamp one timer":
             case "turn on lamp1 timer":
+            case "turn on lamp 1 timer":
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -206,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "turn on lamp two timer":
             case "turn on lamp2 timer":
+            case "turn on lamp 2 timer":
             case "turn on lamp to timer":
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -216,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "turn off lamp one timer":
             case "turn off lamp1 timer":
+            case "turn off lamp 1 timer":
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -225,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "turn off lamp two timer":
             case "turn off lamp2 timer":
+            case "turn off lamp 2 timer":
             case "turn off lamp to timer":
                 handler.postDelayed(new Runnable() {
                     @Override
