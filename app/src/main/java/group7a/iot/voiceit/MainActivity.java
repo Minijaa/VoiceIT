@@ -5,11 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioRecord;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,8 +21,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -58,14 +53,15 @@ public class MainActivity extends AppCompatActivity {
     SpeakerRecognition mSpeakerRecognition = new SpeakerRecognition();
     private static final int SPEECH_REQUEST_CODE = 0;
 
-    // Requesting permission to RECORD_AUDIO
-    private boolean permissionToRecordAccepted = false;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
     private static final int PERMISSION_RECORD_AUDIO = 0;
     private MainActivity.RecordWaveTask recordTask = null;
     private File fileToSend;
+    private static final String HOSTNAME = "10.200.11.154";
+    private static final String USERNAME = "pi";
+    private static final String PASSWORD = "voiceit";
 
-    //hashmap with all numbers in text-form
+    //Hashmap with all numbers in text-form
     private Map<String, Integer> textNumbers = new HashMap<>();
     private List<String> mapNumbers = Arrays.asList("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"
             , "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "twentyone"
@@ -74,20 +70,16 @@ public class MainActivity extends AppCompatActivity {
             , "fourty", "fourtyone", "fourtytwo", "fourtythree", "fourtyfour", "fourtyfive", "fourtysix", "fourtyseven", "sourtyeight", "fourtynine"
             , "fifty", "fiftyone", "fiftytwo", "fiftythree", "fiftyfour", "fiftyfive", "fiftysix", "fiftyseven", "fiftyeight", "fiftynine");
 
-
-    // Create an intent that can start the Speech Recognizer activity
-
     private void activateVoiceRecognition() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH );
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en_US");
         intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
         intent.putExtra(RecognizerIntent.LANGUAGE_MODEL_FREE_FORM, true);
-// Start the activity, the intent will be populated with the speech text
+        //Start activity to activate voice recognition.
         startActivityForResult(intent, SPEECH_REQUEST_CODE);
     }
 
-    // This callback is invoked when the Speech Recognizer returns.
-// This is where you process the intent and extract the speech text from the intent.
+    //The result from Speaker Recognizer is attained in this call back method.
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
@@ -106,17 +98,17 @@ public class MainActivity extends AppCompatActivity {
 
     private String handleInput(String spokenText) {
         String[] inputTextTemp = spokenText.split(" ");
-        ArrayList<String> inputText = new ArrayList<String>(Arrays.asList(inputTextTemp));
-        String command = "";
+        ArrayList<String> inputText = new ArrayList<>(Arrays.asList(inputTextTemp));
+        StringBuilder command = new StringBuilder();
         for(int i = 0; i < inputText.size()-2; i++) {
-            command += inputText.get(i);
+            command.append(inputText.get(i));
             if(i < inputText.size()-2) {
-                command += " ";
+                command.append(" ");
             }
         }
         return command + inputText.get(inputText.size()-1);
     }
-
+    //Handle time for the scheduling function
     private int handleTimerTime(String spokenText) {
         String[] temporary = spokenText.split(" ");
         String k = temporary[temporary.length-2];
@@ -142,12 +134,19 @@ public class MainActivity extends AppCompatActivity {
             if(textNumbers.containsKey(k)) {
                 digit = textNumbers.get(k);
                 Log.i("My_Tag", "value: " + digit);
-                if (temporary[temporary.length-1].equals("hours") || temporary[temporary.length-1].equals("hour")) {
-                    digit = digit * 3600000;
-                } else if (temporary[temporary.length-1].equals("minutes") || temporary[temporary.length-1].equals("minute")) {
-                    digit = digit * 60000;
-                } else if (temporary[temporary.length-1].equals("seconds") || temporary[temporary.length-1].equals("second")) {
-                    digit = digit * 1000;
+                switch (temporary[temporary.length - 1]) {
+                    case "hours":
+                    case "hour":
+                        digit = digit * 3600000;
+                        break;
+                    case "minutes":
+                    case "minute":
+                        digit = digit * 60000;
+                        break;
+                    case "seconds":
+                    case "second":
+                        digit = digit * 1000;
+                        break;
                 }
                 return digit;
             } else {
@@ -181,9 +180,8 @@ public class MainActivity extends AppCompatActivity {
                 startAsyncTask("tdtool --on 1");
                 break;
             case "turn on lamp two":
-                //Start second speak-methods which initiates speaker recognition
-                speak("Please repeat your password phrase.", 1);
-                //startAsyncTask("tdtool --on 2");
+                //Start second speak-method which initiates speaker recognition
+                speak("Please repeat your PASSWORD phrase.", 1);
                 break;
             case "turn off lamp one":
                 startAsyncTask("tdtool --off 1");
@@ -249,17 +247,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public String run(String command) {
-        //ÄNDRA IP EFTER VARJE UPPKOPPLING
-        //String hostname = "192.168.0.31";
-        String hostname = "10.200.11.154";
-        String username = "pi";
-        String password = "voiceit";
-        String returnString = "";
+    public void run(String command) {
         try {
-            Connection conn = new Connection(hostname);
+            Connection conn = new Connection(HOSTNAME);
             conn.connect();
-            boolean isAuthenticated = conn.authenticateWithPassword(username, password);
+            boolean isAuthenticated = conn.authenticateWithPassword(USERNAME, PASSWORD);
             if (!isAuthenticated)
                 throw new IOException("Authentication failed.");
             Session sess = conn.openSession();
@@ -279,12 +271,12 @@ public class MainActivity extends AppCompatActivity {
                         strB.append("\n");
                         System.out.println(line);
                     }
-                    String hej = strB.toString();
-                    String[] lines = hej.split("\\n");
+                    String tmp = strB.toString();
+                    String[] lines = tmp.split("\\n");
                     lines = lines[0].split("\\t");
                     lines = lines[4].split("=");
 
-                    String[] lines2 = hej.split("\\n");
+                    String[] lines2 = tmp.split("\\n");
                     lines2 = lines2[1].split("\\t");
                     lines2 = lines2[4].split("=");
 
@@ -300,7 +292,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace(System.err);
             System.exit(2);
         }
-        return returnString;
     }
 
     public void startAsyncTask(final String command) {
@@ -422,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
         Thread.sleep(2000);
         activateSoundRecording();
 
-        //Wait for password-phrase
+        //Wait for PASSWORD-phrase
         Thread.sleep(4000);
 
         //Stop recording
@@ -483,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
         recordTask.setContext(null);
         return recordTask;
     }
-
+    //The following class is written by Kevin Mark 2016, with only minor changes by us.
     private class RecordWaveTask extends AsyncTask<File, Void, Object[]> {
 
         // Sound file settings.
@@ -514,14 +505,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Object[] doInBackground(File... files) {
             AudioRecord audioRecord = null;
-            FileOutputStream wavOut = null;
             long startTime = 0;
             long endTime = 0;
 
-            try {
+            audioRecord = new AudioRecord(AUDIO_SOURCE, SAMPLE_RATE, CHANNEL_MASK, ENCODING, BUFFER_SIZE);
+            try (FileOutputStream wavOut = new FileOutputStream(files[0])) {
                 // Open our two resources
-                audioRecord = new AudioRecord(AUDIO_SOURCE, SAMPLE_RATE, CHANNEL_MASK, ENCODING, BUFFER_SIZE);
-                wavOut = new FileOutputStream(files[0]);
 
                 // Write out the wav file header
                 writeWavHeader(wavOut, CHANNEL_MASK, SAMPLE_RATE, ENCODING);
@@ -560,17 +549,10 @@ public class MainActivity extends AppCompatActivity {
                             audioRecord.stop();
                             endTime = SystemClock.elapsedRealtime();
                         }
-                    } catch (IllegalStateException ex) {
+                    } catch (IllegalStateException ignored) {
                     }
                     if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
                         audioRecord.release();
-                    }
-                }
-                if (wavOut != null) {
-                    try {
-                        wavOut.close();
-
-                    } catch (IOException ex) {
                     }
                 }
             }
@@ -687,10 +669,8 @@ public class MainActivity extends AppCompatActivity {
                     .putInt((int) (wav.length() - 44)) // Subchunk2Size
                     .array();
 
-            RandomAccessFile accessWave = null;
             //noinspection CaughtExceptionImmediatelyRethrown
-            try {
-                accessWave = new RandomAccessFile(wav, "rw");
+            try (RandomAccessFile accessWave = new RandomAccessFile(wav, "rw")) {
                 // ChunkSize
                 accessWave.seek(4);
                 accessWave.write(sizes, 0, 4);
@@ -699,7 +679,7 @@ public class MainActivity extends AppCompatActivity {
                 accessWave.seek(40);
                 accessWave.write(sizes, 4, 4);
                 fileToSend = wav;
-                //Ta med koden nedan om du vill höra din inspelning
+                //Uncomment the following if you want feedback of your recording.
 //                Uri uri = Uri.parse(fileToSend.getAbsolutePath());
 //                MediaPlayer mediaPlayer = new MediaPlayer();
 //                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -711,14 +691,6 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException ex) {
                 // Rethrow but we still close accessWave in our finally
                 throw ex;
-            } finally {
-                if (accessWave != null) {
-                    try {
-                        accessWave.close();
-                    } catch (IOException ex) {
-                        //
-                    }
-                }
             }
         }
 
@@ -758,8 +730,8 @@ public class MainActivity extends AppCompatActivity {
                     // Display final recording stats
                     double size = (long) results[0] / 1000000.00;
                     long time = (long) results[1] / 1000;
-                    //Toast.makeText(ctx, String.format(Locale.getDefault(), "%.2f MB / %d seconds",
-                      //      size, time), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ctx, String.format(Locale.getDefault(), "%.2f MB / %d seconds",
+                            size, time), Toast.LENGTH_LONG).show();
                 } else {
                     // Error
                     Toast.makeText(ctx, throwable.getLocalizedMessage(), Toast.LENGTH_LONG).show();

@@ -9,8 +9,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class SpeakerRecognition {
-    //VerificationProfileID för Samuel är = 5ce07214-c2c8-4799-83b2-45c334750e52
-    //VerificationProfileID för Samuel2 är = 6e54c829-e388-4444-946c-10d388f8960c
+    //VerificationProfileID för Samuel1 (My voice is stronger than passwords) är = 5ce07214-c2c8-4799-83b2-45c334750e52
+    //VerificationProfileID för Samuel2 (My password is not your business) är = 6e54c829-e388-4444-946c-10d388f8960c
     private OkHttpClient client = new OkHttpClient();
 
     public void createProfile() {
