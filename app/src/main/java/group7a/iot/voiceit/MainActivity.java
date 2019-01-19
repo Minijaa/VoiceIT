@@ -50,9 +50,6 @@ import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 
 public class MainActivity extends AppCompatActivity {
-    TextView txv_temp_indoor = null;
-    TextView txv_temp_outdoor = null;
-    Switch btnToggle = null;
     ImageButton mainButton = null;
     private volatile String innerTemp = "0";
     private volatile String outerTemp = "";
@@ -81,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     // Create an intent that can start the Speech Recognizer activity
 
     private void activateVoiceRecognition() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH );
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en_US");
         intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
         intent.putExtra(RecognizerIntent.LANGUAGE_MODEL_FREE_FORM, true);
@@ -127,13 +124,17 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             digit = Integer.parseInt(k);
-            speak("The lamp will be turned " + temporary[1] + " in " + digit + temporary[temporary.length-1]);
-            if (temporary[temporary.length-1].equalsIgnoreCase("hours") || temporary[temporary.length-1].equalsIgnoreCase("hour")) {
+            speak("The lamp will be turned " + temporary[1] + " in "
+                    + digit + temporary[temporary.length-1]);
+            if (temporary[temporary.length-1].equalsIgnoreCase("hours") ||
+                    temporary[temporary.length-1].equalsIgnoreCase("hour")) {
                 digit = digit * 3600000;
 
-            } else if (temporary[temporary.length-1].equalsIgnoreCase("minutes") || temporary[temporary.length-1].equalsIgnoreCase("minute")) {
+            } else if (temporary[temporary.length-1].equalsIgnoreCase("minutes") ||
+                    temporary[temporary.length-1].equalsIgnoreCase("minute")) {
                 digit = digit * 60000;
-            } else if (temporary[temporary.length-1].equalsIgnoreCase("seconds") || temporary[temporary.length-1].equalsIgnoreCase("second")) {
+            } else if (temporary[temporary.length-1].equalsIgnoreCase("seconds") ||
+                    temporary[temporary.length-1].equalsIgnoreCase("second")) {
                 digit = digit * 1000;
             }
             return digit;
@@ -248,10 +249,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public String run(String command) {
         //ÄNDRA IP EFTER VARJE UPPKOPPLING
-        //String hostname = "10.200.18.22";
+        //String hostname = "192.168.0.31";
         String hostname = "10.200.11.154";
         String username = "pi";
         String password = "voiceit";
@@ -330,8 +330,6 @@ public class MainActivity extends AppCompatActivity {
                     case "tdtool --list-sensors":
                         speak("The inside temperature is " + innerTemp + " and the outside temperature is " + outerTemp);
                 }
-                txv_temp_indoor.setText(innerTemp);
-                txv_temp_outdoor.setText(outerTemp);
             }
         }.execute(1);
     }
@@ -357,9 +355,7 @@ public class MainActivity extends AppCompatActivity {
                             speak("The inside temperature is " + innerTemp + " and the outside temperature is " + outerTemp);
                         }
                 }
-                txv_temp_indoor.setText(innerTemp);
-                txv_temp_outdoor.setText(outerTemp);
-            }
+                            }
         }.execute(1);
     }
 
@@ -378,48 +374,8 @@ public class MainActivity extends AppCompatActivity {
             counter++;
         }
 
-        txv_temp_indoor = findViewById(R.id.indoorTempShow);
-        txv_temp_outdoor = findViewById(R.id.outdoorTempShow);
-        btnToggle = findViewById(R.id.btnToggle);
         mainButton = findViewById(R.id.micButton);
 
-        //Ta bort denna knapp och allt den innehåller när vi inte behöver
-        //testa speaker recognition utan raspberry pi längre
-        btnToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    activateSoundRecording(); //STARTA LJUDINSPELNING
-                    //mSpeakerRecognition.createProfile();
-                } else {
-
-/*                    try {
-
-                    } catch (Exception e) {
-                        System.out.println("BobooRecord");
-                        e.printStackTrace();
-                    }
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        // Request permission
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.RECORD_AUDIO},
-                                PERMISSION_RECORD_AUDIO);
-                        return;
-                    }
-                    // Permission already available
-
-*/
-                    //mSpeakerRecognition.createProfile();
-
-                    if (!recordTask.isCancelled() && recordTask.getStatus() == AsyncTask.Status.RUNNING) {
-                        recordTask.cancel(false);
-                    } else {
-                        Toast.makeText(MainActivity.this, "Task not running.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
         mainButton.setOnClickListener(new CompoundButton.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -431,7 +387,6 @@ public class MainActivity extends AppCompatActivity {
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {
                     int ttsLang = textToSpeech.setLanguage(Locale.US);
-
                     if (ttsLang == TextToSpeech.LANG_MISSING_DATA
                             || ttsLang == TextToSpeech.LANG_NOT_SUPPORTED) {
                         Log.e("TTS", "The Language is not supported!");
@@ -442,11 +397,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(getApplicationContext(), "TTS Initialization failed!", Toast.LENGTH_SHORT).show();
                 }
-
             }
-
         });
-        //initiatieAlize();
         // Restore the previous task or create a new one if necessary
         recordTask = (MainActivity.RecordWaveTask) getLastCustomNonConfigurationInstance();
         if (recordTask == null) {
@@ -457,8 +409,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void speak(String whatToSpeak) {
-        int speechStatus = textToSpeech.speak(whatToSpeak, TextToSpeech.QUEUE_FLUSH, null);
-
+        int speechStatus = textToSpeech.speak(whatToSpeak,
+                TextToSpeech.QUEUE_FLUSH, null);
         if (speechStatus == TextToSpeech.ERROR) {
             Log.e("TTS", "Error in converting Text to Speech!");
         }
@@ -522,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
                 }
         }
         File wavFile = new File(getFilesDir(), "recording_" + System.currentTimeMillis() / 1000 + ".wav");
-        Toast.makeText(this, wavFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, wavFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
         recordTask.execute(wavFile);
     }
 
@@ -806,8 +758,8 @@ public class MainActivity extends AppCompatActivity {
                     // Display final recording stats
                     double size = (long) results[0] / 1000000.00;
                     long time = (long) results[1] / 1000;
-                    Toast.makeText(ctx, String.format(Locale.getDefault(), "%.2f MB / %d seconds",
-                            size, time), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(ctx, String.format(Locale.getDefault(), "%.2f MB / %d seconds",
+                      //      size, time), Toast.LENGTH_LONG).show();
                 } else {
                     // Error
                     Toast.makeText(ctx, throwable.getLocalizedMessage(), Toast.LENGTH_LONG).show();

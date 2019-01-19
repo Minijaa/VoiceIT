@@ -67,21 +67,23 @@ public class SpeakerRecognition {
         }
     }
 
-    public boolean verifySpeaker(File file) {
+    boolean verifySpeaker(File file) {
         MediaType mediaType = MediaType.parse("multipart/form-data");
         RequestBody body = RequestBody.create(mediaType, file);
         Request request = new Request.Builder()
-                .url("https://westus.api.cognitive.microsoft.com/spid/v1.0/verify?verificationProfileId={6e54c829-e388-4444-946c-10d388f8960c}")
+                .url("https://westus.api.cognitive.microsoft.com/spid/v1.0/" +
+                        "verify?verificationProfileId={5ce07214-c2c8-4799-83b2-45c334750e52}")
                 .post(body)
-                .addHeader("Ocp-Apim-Subscription-Key", "ac4d7534bab4421fb7116f7013811296")
+                .addHeader("Ocp-Apim-Subscription-Key",
+                        "ac4d7534bab4421fb7116f7013811296")
                 .addHeader("Content-Type", "multipart/form-data")
                 .build();
         try {
             Response response = client.newCall(request).execute();
-            System.out.println(response);
             String responseString = response.body() != null ? response.body().string() : null;
             System.out.println(responseString);
-            if ((responseString != null && responseString.contains("Accept")) && responseString.contains("High")){
+            if ((responseString != null && responseString.contains("Accept"))
+                    && (responseString.contains("High") || responseString.contains("Normal"))){
                 return true;
             }
             response.close();
