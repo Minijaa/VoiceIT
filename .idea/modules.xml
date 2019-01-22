@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/VoiceIT.iml" filepath="$PROJECT_DIR$/.idea/VoiceIT.iml" />
+      <module fileurl="file://$PROJECT_DIR$/VoiceIT.iml" filepath="$PROJECT_DIR$/VoiceIT.iml" />
       <module fileurl="file://$PROJECT_DIR$/alize-debug/alize-debug.iml" filepath="$PROJECT_DIR$/alize-debug/alize-debug.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

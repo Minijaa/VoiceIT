@@ -45,12 +45,12 @@ import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 
 public class MainActivity extends AppCompatActivity {
-    ImageButton mainButton = null;
+    private ImageButton mainButton = null;
     private volatile String innerTemp = "0";
     private volatile String outerTemp = "";
     private TextToSpeech textToSpeech;
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    SpeakerRecognition mSpeakerRecognition = new SpeakerRecognition();
+    private SpeakerRecognition mSpeakerRecognition = new SpeakerRecognition();
     private static final int SPEECH_REQUEST_CODE = 0;
 
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
